@@ -21,49 +21,49 @@ function islandora_paged_content_manage_page_menu(AbstractObject $object) {
   // @FIXME
 // drupal_set_title() has been removed. There are now a few ways to set the title
 // dynamically, depending on the situation.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2067859
 // drupal_set_title($object->label);
 
-  $manage_tabs = array(
-    'manage_page' => array(
+  $manage_tabs = [
+    'manage_page' => [
       '#type' => 'vertical_tabs',
-      'pdf' => array(
+      'pdf' => [
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Create a PDF'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_pdf_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'ocr' => array(
+      ],
+      'ocr' => [
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Perform OCR'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_ocr_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
-      ),
-      'images' => array(
+      ],
+      'images' => [
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Create Images'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_images_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'edit_ocr' => array(
+      ],
+      'edit_ocr' => [
         '#access' => isset($object['OCR']) && isset($object['JPG']) && islandora_datastream_access(ISLANDORA_PAGED_CONTENT_EDIT_OCR, $object['OCR']),
         '#title' => t('Edit OCR'),
         '#type' => 'fieldset',
         'form' => isset($object['OCR']) && isset($object['JPG']) ? \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_edit_ocr_form', $object) : NULL,
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-    ),
-  );
-  $context = array('object' => $object);
+      ],
+    ],
+  ];
+  $context = ['object' => $object];
   \Drupal::moduleHandler()->alter('islandora_paged_content_page_management_tabs', $manage_tabs, $context);
   return $manage_tabs;
 }
@@ -87,27 +87,27 @@ function islandora_paged_content_manage_page_ocr_form(array $form, array &$form_
   $can_derive = islandora_paged_content_can_derive($object, 'OCR');
   $languages = \Drupal::moduleHandler()->moduleExists('islandora_ocr') ? islandora_ocr_get_enabled_tesseract_languages() : array('eng' => t('English'));
   unset($languages['no_ocr']);
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t('You must have <b>Islandora OCR</b> installed to create OCR/HOCR files.'),
-    ),
-    'language' => array(
+    ],
+    'language' => [
       '#title' => t('Language'),
       '#type' => 'select',
       '#description' => t('Please select the language the page is written in.'),
       '#options' => $languages,
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#disabled' => !$can_derive,
       '#type' => 'submit',
       '#value' => t('Perform OCR'),
-    ),
-    'pid' => array(
+    ],
+    'pid' => [
       '#type' => 'hidden',
       '#value' => $object->id,
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -121,10 +121,10 @@ function islandora_paged_content_manage_page_ocr_form(array $form, array &$form_
 function islandora_paged_content_manage_page_ocr_form_submit(array $form, array &$form_state) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $object = islandora_object_load($form_state['values']['pid']);
-  $options = array(
+  $options = [
     'language' => $form_state['values']['language'],
     'preprocess' => FALSE,
-  );
+  ];
   if (islandora_paged_content_page_derive_ocr_datastreams($object, $options)) {
     drupal_set_message(t('Successfully performed OCR.'), 'status');
   }
@@ -149,21 +149,21 @@ function islandora_paged_content_manage_page_ocr_form_submit(array $form, array 
 function islandora_paged_content_manage_page_images_form(array $form, array &$form_state, AbstractObject $object) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $can_derive = islandora_paged_content_can_derive($object, 'JP2');
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t('You must have the <b>Large Image Solution Pack</b> installed to create images.<br/>This will update the TN, JPG and JP2 datastreams.'),
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#disabled' => !$can_derive,
       '#type' => 'submit',
       '#value' => t('Create Images'),
-    ),
-    'pid' => array(
+    ],
+    'pid' => [
       '#type' => 'hidden',
       '#value' => $object->id,
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -202,27 +202,27 @@ function islandora_paged_content_manage_page_pdf_form(array $form, array &$form_
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $form_state['object'] = $object;
   $can_derive = islandora_paged_content_can_derive($object, 'PDF');
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t('You must have <b>ImageMagick</b> installed to create PDF files.'),
-    ),
-    'dpi' => array(
+    ],
+    'dpi' => [
       '#type' => 'select',
       '#title' => t('DPI (Dots Per Inch)'),
       '#description' => t('Set the DPI for the generated PDF.'),
-      '#options' => array_combine(array('72', '96', '300', '600'), array('72', '96', '300', '600')),
-    ),
-    'submit' => array(
+      '#options' => array_combine(['72', '96', '300', '600'], ['72', '96', '300', '600']),
+    ],
+    'submit' => [
       '#disabled' => !$can_derive,
       '#type' => 'submit',
       '#value' => t('Create PDF'),
-      'pid' => array(
+      'pid' => [
         '#type' => 'hidden',
         '#value' => $object->id,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**
@@ -236,10 +236,10 @@ function islandora_paged_content_manage_page_pdf_form(array $form, array &$form_
 function islandora_paged_content_manage_page_pdf_form_submit(array $form, array &$form_state) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $object = islandora_object_load($form_state['values']['pid']);
-  $options = array(
+  $options = [
     '-density' => $form_state['values']['dpi'],
     '-compress' => 'LZW',
-  );
+  ];
   if (islandora_paged_content_page_derive_pdf_datastream($object, $options)) {
     drupal_set_message(t('Successfully created PDF.'), 'status');
   }
@@ -277,8 +277,8 @@ function islandora_paged_content_manage_page_edit_ocr_form(array $form, array &$
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_library('system', 'ui.dialog');
@@ -287,8 +287,8 @@ function islandora_paged_content_manage_page_edit_ocr_form(array $form, array &$
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js(array('pid' => $pid, 'width' => $width), 'setting');
@@ -296,8 +296,8 @@ function islandora_paged_content_manage_page_edit_ocr_form(array $form, array &$
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js("$path/js/islandora_page_ocr_edit.js");
@@ -305,22 +305,22 @@ function islandora_paged_content_manage_page_edit_ocr_form(array $form, array &$
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_css("$path/css/islandora_paged_content.css");
 
 
   $form_state['object'] = $object;
-  $form = array();
+  $form = [];
   // @FIXME
 // theme() has been renamed to _theme() and should NEVER be called directly.
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // $img = theme('image', array(
 //     'path' => "islandora/object/$pid/datastream/JPG/view",
@@ -330,31 +330,31 @@ function islandora_paged_content_manage_page_edit_ocr_form(array $form, array &$
 
   $label = $object->label;
   $prompt = t('Show reference image');
-  $form['image'] = array(
+  $form['image'] = [
     '#title' => t('Reference Image'),
     '#type' => 'markup',
     '#markup' => "<div id ='ref_image' title='$prompt'><a class='preview' href='#'>$prompt</a> <div class='ref_image' title = '$label'>$img</div>",
-    '#attributes' => array('class' => array('ocr_image')),
-  );
+    '#attributes' => ['class' => ['ocr_image']],
+  ];
 
-  $form['ocr'] = array(
+  $form['ocr'] = [
     '#title' => t('Current OCR'),
     '#type' => 'textarea',
     '#default_value' => $object['OCR']->content,
     '#rows' => 40,
     '#cols' => 20,
-    '#attributes' => array('class' => array('ocr_window')),
-  );
+    '#attributes' => ['class' => ['ocr_window']],
+  ];
 
-  $form['submit'] = array(
+  $form['submit'] = [
     '#type' => 'submit',
     '#value' => t('Update OCR'),
-  );
+  ];
 
-  $form['pid'] = array(
+  $form['pid'] = [
     '#type' => 'hidden',
     '#value' => $object->id,
-  );
+  ];
 
   return $form;
 }

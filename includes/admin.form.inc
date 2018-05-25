@@ -19,21 +19,21 @@
 function islandora_paged_content_admin_settings_form_executable_available_message($path, $version = NULL, $required_version = NULL) {
   $available = is_executable($path);
   if ($available) {
-    $image = theme_image(array('path' => 'misc/watchdog-ok.png', 'attributes' => array()));
-    $message = t('Executable found at @path', array('@path' => $path));
+    $image = theme_image(['path' => 'misc/watchdog-ok.png', 'attributes' => []]);
+    $message = t('Executable found at @path', ['@path' => $path]);
     if ($version) {
-      $message .= t('<br/>Version: @version', array('@version' => $version));
+      $message .= t('<br/>Version: @version', ['@version' => $version]);
     }
     if ($required_version) {
-      $message .= t('<br/>Required Version: @version', array('@version' => $required_version));
+      $message .= t('<br/>Required Version: @version', ['@version' => $required_version]);
       if (version_compare($version, $required_version) < 0) {
-        $image = theme_image(array('path' => 'misc/watchdog-error.png', 'attributes' => array()));
+        $image = theme_image(['path' => 'misc/watchdog-error.png', 'attributes' => []]);
       }
     }
   }
   else {
-    $image = theme_image(array('path' => 'misc/watchdog-error.png', 'attributes' => array()));
-    $message = t('Unable to locate executable at @path', array('@path' => $path));
+    $image = theme_image(['path' => 'misc/watchdog-error.png', 'attributes' => []]);
+    $message = t('Unable to locate executable at @path', ['@path' => $path]);
   }
   return $image . $message;
 }
@@ -67,12 +67,12 @@ function islandora_paged_content_admin_settings_form_djatoka_availible_message($
   $file_headers = @get_headers($djatoka_url);
   $djatoka_availible = strstr($file_headers[0], '200') !== FALSE;
   if ($djatoka_availible) {
-    $image = theme_image(array('path' => 'misc/watchdog-ok.png', 'attributes' => array()));
+    $image = theme_image(['path' => 'misc/watchdog-ok.png', 'attributes' => []]);
     $message = t('djatoka url is valid.');
   }
   else {
-    $image = theme_image(array('path' => 'misc/watchdog-error.png', 'attributes' => array()));
-    $message = t('Unable to locate djatoka installation at @path', array('@path' => $djatoka_url));
+    $image = theme_image(['path' => 'misc/watchdog-error.png', 'attributes' => []]);
+    $message = t('Unable to locate djatoka installation at @path', ['@path' => $djatoka_url]);
   }
   return $image . $message;
 }

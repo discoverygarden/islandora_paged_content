@@ -15,7 +15,7 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
   $results = $object->relationships->get(ISLANDORA_RELS_EXT_URI, 'isPageOf');
   $result = reset($results);
   $parent = $result ? islandora_object_load($result['object']['value']) : FALSE;
-  $pages = $parent ? islandora_paged_content_get_pages($parent) : array();
+  $pages = $parent ? islandora_paged_content_get_pages($parent) : [];
   $pages = array_keys($pages);
   if (empty($pages)) {
     $pages[] = $object->id;
@@ -23,7 +23,7 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
   $index = array_search($object->id, $pages);
   $previous_page = isset($pages[$index - 1]) ? $pages[$index - 1] : NULL;
   $next_page = isset($pages[$index + 1]) ? $pages[$index + 1] : NULL;
-  $links = array();
+  $links = [];
   if ($previous_page) {
     // @FIXME
 // url() expects a route name or an external URI.
@@ -33,10 +33,10 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
 //     );
 
   }
-  $links[] = array(
+  $links[] = [
     'title' => '<strong>' . t('Page') . '</strong>',
     'html' => TRUE,
-  );
+  ];
   if ($next_page) {
     // @FIXME
 // url() expects a route name or an external URI.
@@ -60,8 +60,8 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // return theme('links', array(
 //     'links' => $links,
@@ -80,22 +80,22 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
  */
 function template_preprocess_swaptable(array &$variables) {
   global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
-  \Drupal\Core\Render\Element::setAttributes($variables['element'], array('id', 'name'));
+  \Drupal\Core\Render\Element::setAttributes($variables['element'], ['id', 'name']);
   $table = &$variables['element'];
   $variables['pager'] = swaptable_pagers($table['#pager'], count($table['#rows']));
   $variables['table']['left'] = swaptable_table('left', $table, $variables['pager']['left']);
   $variables['table']['right'] = swaptable_table('right', $table, $variables['pager']['right']);
   $base = $table['#id'];
-  $settings['swapTable'][$base] = array(
+  $settings['swapTable'][$base] = [
     'name' => $table['#name'],
     'order' => $table['order']['#value'],
     'modified' => $table['modified']['#value'],
-  );
+  ];
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js($settings, 'setting');
@@ -115,10 +115,10 @@ function template_preprocess_swaptable(array &$variables) {
  */
 function swaptable_pagers(array $pager, $total) {
   extract($pager);
-  return array(
+  return [
     'left' => swaptable_pager($element['left'], $tags, $quantity, $limit, $total),
     'right' => swaptable_pager($element['right'], $tags, $quantity, $limit, $total),
-  );
+  ];
 }
 
 /**
@@ -140,13 +140,13 @@ function swaptable_pagers(array $pager, $total) {
  */
 function swaptable_pager($element, $tags, $quantity, $limit, $total) {
   $page = pager_default_initialize($total, $limit, $element);
-  return array(
+  return [
     'element' => $element,
     'tags' => $tags,
     'quantity' => $quantity,
     'limit' => $limit,
     'page' => $page,
-  );
+  ];
 }
 
 /**
@@ -168,33 +168,33 @@ function swaptable_pager($element, $tags, $quantity, $limit, $total) {
  *   The rows definition for the table.
  */
 function swaptable_table_rows($position, array $items, array $ordering, array $modified, array $pager) {
-  $rows = array();
+  $rows = [];
   $offset = $pager['page'] * $pager['limit'];
   $ordering = array_slice($ordering, $offset, $pager['limit']);
   $original_ordering = \Drupal\Core\Render\Element::children($items);
   foreach ($ordering as $i => $item) {
     $row = $items[$item];
-    $data = array();
-    $data[] = array(
+    $data = [];
+    $data[] = [
       'data' => $offset + $i + 1,
-      'class' => array('ordering'),
-    );
-    $data[] = array(
+      'class' => ['ordering'],
+    ];
+    $data[] = [
       'data' => array_search($item, $original_ordering) + 1,
-      'class' => array('original-ordering', 'swaptable-hide'),
-    );
+      'class' => ['original-ordering', 'swaptable-hide'],
+    ];
     foreach (\Drupal\Core\Render\Element::children($row) as $j) {
       $cell = $row[$j];
-      $data[] = array(
+      $data[] = [
         'data' => empty($cell['#printed']) ? \Drupal::service("renderer")->render($cell) : $cell['#children'],
-        'class' => array($j),
-      );
+        'class' => [$j],
+      ];
     }
-    $rows[] = array(
+    $rows[] = [
       'id' => str_replace(':', '-', "{$position}-{$item}"),
-      'class' => in_array($item, $modified) ? array('ui-modified') : array(),
+      'class' => in_array($item, $modified) ? ['ui-modified'] : [],
       'data' => $data,
-    );
+    ];
   }
   return $rows;
 }
@@ -216,19 +216,19 @@ function swaptable_table($position, array $table, array $pager) {
   $table['#attributes']['id'] = "{$table['#id']}-{$position}";
   $table['#attributes']['name'] = $position;
   $table['#attributes']['valign'] = 'top';
-  $header = array(
-    array(
+  $header = [
+    [
       'data' => t('Page #'),
-      'class' => array('ordering'),
-    ),
-    array(
+      'class' => ['ordering'],
+    ],
+    [
       'data' => t('*Original Page #'),
-      'class' => array('original-ordering', 'swaptable-hide'),
-    ),
-  );
-  return array(
+      'class' => ['original-ordering', 'swaptable-hide'],
+    ],
+  ];
+  return [
     'header' => array_merge($header, $table['#header']),
     'rows' => swaptable_table_rows($position, $table['#rows'], $table['order']['#value'], $table['modified']['#value'], $pager),
     'attributes' => $table['#attributes'],
-  );
+  ];
 }

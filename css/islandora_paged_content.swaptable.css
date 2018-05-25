@@ -1,3 +1,4 @@
+// @codingStandardsIgnoreFile
 a.swaptable-handle-hover .handle {
   background-position: 6px -11px;
 }
@@ -22,13 +23,15 @@ table.swaptable tbody > tr {
 tbody > tr.ui-selecting:not(ui-placeholder) {
   background: #ccc;
 }
-tbody > tr.ui-selected, .ui-helper {
+tbody > tr.ui-selected,
+.ui-helper {
   background: #999;
 }
 .swaptable-toggle-original-ordering {
   font-size: 0.9em;
 }
-.swaptable-toggle-original-ordering-wrapper, .swaptable-display-select {
+.swaptable-toggle-original-ordering-wrapper,
+.swaptable-display-select {
   text-align: right;
 }
 tr.ui-modified > td.tn:after {
@@ -45,7 +48,7 @@ tr.ui-modified > td.tn:after {
   dropping of items being drug when there was intersection with a placeholder.
   The bug can be examined at 4fd864c2629949ca4c67bbe52e4cf4d740528735*/
 tr.ui-placeholder {
-  display:none;
+  display: none;
 }
 /* IE7 doesn't support pseudo elements elements such as :after so we hack it
    with some inline javascript.

@@ -9,19 +9,19 @@
  * Implements hook_drush_command().
  */
 function islandora_paged_content_drush_command() {
-  return array(
-    'paged-content-consolidate-missing-ocr' => array(
-      'aliases' => array('pccmo'),
+  return [
+    'paged-content-consolidate-missing-ocr' => [
+      'aliases' => ['pccmo'],
       'description' => dt('Consolidates and appends paged content page OCR to any paged content objects with no OCR datastream.'),
       'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
-      'drupal dependencies' => array(
+      'drupal dependencies' => [
         'islandora_ocr',
-      ),
-      'examples' => array(
+      ],
+      'examples' => [
         'Trigger OCR consolidation' => 'drush -u 1 paged-content-consolidate-missing-ocr',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**

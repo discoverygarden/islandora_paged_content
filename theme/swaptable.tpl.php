@@ -1,6 +1,8 @@
 <?php
+
 /**
  * @file
+ * Swaptable element template.
  */
 ?>
 <div id='<?php print $element['#id']; ?>'>
@@ -16,8 +18,8 @@
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // print theme('table', $table['left']);
  ?>
@@ -26,8 +28,8 @@
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // print theme('pager', $pager['left']);
  ?>
@@ -39,8 +41,8 @@
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // print theme('table', $table['right']);
  ?>
@@ -49,8 +51,8 @@
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // print theme('pager', $pager['right']);
  ?>

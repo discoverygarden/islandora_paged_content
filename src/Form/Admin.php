@@ -1,17 +1,15 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\islandora_paged_content\Form\IslandoraPagedContentAdminSettingsForm.
- */
-
 namespace Drupal\islandora_paged_content\Form;
 
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 
-class Admin extends ConfigFormBase {
+use Drupal\islandora\Form\ModuleHandlerAdminForm;
+
+/**
+ * Module admin form.
+ */
+class Admin extends ModuleHandlerAdminForm {
 
   /**
    * {@inheritdoc}
@@ -26,16 +24,7 @@ class Admin extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('islandora_paged_content.settings');
 
-    foreach (Element::children($form) as $variable) {
-      $config->set($variable, $form_state->getValue($form[$variable]['#parents']));
-    }
     $config->save();
-
-    if (method_exists($this, '_submitForm')) {
-      $this->_submitForm($form, $form_state);
-    }
-
-    parent::submitForm($form, $form_state);
   }
 
   /**
@@ -45,10 +34,12 @@ class Admin extends ConfigFormBase {
     return ['islandora_paged_content.settings'];
   }
 
-  public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/admin.form');
-    $get_default_value = function($name, $default) use(&$form_state) {
-      // @FIXME
+    $get_default_value = function ($name, $default) use ($form_state) {
 // // @FIXME
 // // The correct configuration object could not be determined. You'll need to
 // // rewrite this call manually.
@@ -61,18 +52,17 @@ class Admin extends ConfigFormBase {
 
     $djatoka_url = $get_default_value('islandora_paged_content_djatoka_url', 'http://localhost:8080/adore-djatoka/');
     $djatoka_availible_message = islandora_paged_content_admin_settings_form_djatoka_availible_message($djatoka_url);
-    $solr_enabled = \Drupal::moduleHandler()->moduleExists('islandora_solr');
+    $solr_enabled = $this->moduleHandler->moduleExists('islandora_solr');
 
     $form = [
       'pdf_derivative_settings' => [
         '#type' => 'fieldset',
-        '#title' => t('PDF Derivative Settings'),
+        '#title' => $this->t('PDF Derivative Settings'),
         'islandora_paged_content_gs' => [
           '#type' => 'textfield',
-          '#title' => t('gs (GhostScript)'),
-          '#description' => t('GhostScript is used to combine PDF files into a representation of a book or newspaper.<br/>!msg', [
-            '!msg' => islandora_paged_content_admin_settings_form_executable_available_message($gs)
-            ]),
+          '#title' => $this->t('gs (GhostScript)'),
+          '#description' => $this->t('GhostScript is used to combine PDF files into a representation of a book or newspaper.<br/>') .
+          islandora_paged_content_admin_settings_form_executable_available_message($gs),
           '#default_value' => $gs,
           '#prefix' => '<div id="gs-wrapper">',
           '#suffix' => '</div>',
@@ -86,13 +76,12 @@ class Admin extends ConfigFormBase {
       ],
       'pdf_paged_content_ingestion_settings' => [
         '#type' => 'fieldset',
-        '#title' => t('PDF Paged Content Ingest Settings'),
+        '#title' => $this->t('PDF Paged Content Ingest Settings'),
         'islandora_paged_content_pdfinfo' => [
           '#type' => 'textfield',
-          '#title' => t('pdfinfo'),
-          '#description' => t('Pdfinfo is used to extract information needed when ingesting a single PDF into paged content and individual page objects.<br/>!msg', [
-            '!msg' => islandora_paged_content_admin_settings_form_executable_available_message($pdfinfo)
-            ]),
+          '#title' => $this->t('pdfinfo'),
+          '#description' => $this->t('Pdfinfo is used to extract information needed when ingesting a single PDF into paged content and individual page objects.<br/>') .
+          islandora_paged_content_admin_settings_form_executable_available_message($pdfinfo),
           '#default_value' => $pdfinfo,
           '#prefix' => '<div id="pdfinfo-wrapper">',
           '#suffix' => '</div>',
@@ -105,10 +94,9 @@ class Admin extends ConfigFormBase {
         ],
         'islandora_paged_content_pdftotext' => [
           '#type' => 'textfield',
-          '#title' => t('pdftotext'),
-          '#description' => t('Pdftotext is used to extract text for OCR when ingesting a single PDF into paged content and individual page objects.<br/>!msg', [
-            '!msg' => islandora_paged_content_admin_settings_form_executable_available_message($pdftotext)
-            ]),
+          '#title' => $this->t('pdftotext'),
+          '#description' => $this->t('Pdftotext is used to extract text for OCR when ingesting a single PDF into paged content and individual page objects.<br/>') .
+          islandora_paged_content_admin_settings_form_executable_available_message($pdftotext),
           '#default_value' => $pdftotext,
           '#prefix' => '<div id="pdftotext-wrapper">',
           '#suffix' => '</div>',
@@ -121,19 +109,17 @@ class Admin extends ConfigFormBase {
         ],
         'islandora_paged_content_pdftotext_use_raw' => [
           '#type' => 'checkbox',
-          '#title' => t('Allow Extraction of Raw Text'),
-          '#description' => t('This will pass the -raw parameter off to pdftotext when extracting text. By default, pdftotext extracts text in natural reading order. In edge case documents, where PDF creation tools have made blocks in errorneous order, text extraction will yield unexpected results. As such, this parameter will pull out text in the order that the PDF creation tool wrote it (layout ignored). This is not a valid default option to have due to that PDF creation tools are not constrained to writing blocks in the order they appear and it is up to the PDF reader to render them correctly.'),
-          '#default_value' => \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_pdftotext_use_raw'),
+          '#title' => $this->t('Allow Extraction of Raw Text'),
+          '#description' => $this->t('This will pass the -raw parameter off to pdftotext when extracting text. By default, pdftotext extracts text in natural reading order. In edge case documents, where PDF creation tools have made blocks in errorneous order, text extraction will yield unexpected results. As such, this parameter will pull out text in the order that the PDF creation tool wrote it (layout ignored). This is not a valid default option to have due to that PDF creation tools are not constrained to writing blocks in the order they appear and it is up to the PDF reader to render them correctly.'),
+          '#default_value' => $this->config('islandora_paged_content.settings')->get('islandora_paged_content_pdftotext_use_raw'),
         ],
       ],
       'islandora_paged_content_djatoka_url' => [
         '#type' => 'textfield',
         '#prefix' => '<div id="djatoka-path-wrapper">',
         '#suffix' => '</div>',
-        '#title' => t('djatoka URL'),
-        '#description' => \Drupal\Component\Utility\Xss::filter(t('<strong>Externally accessible</strong> URL to the djatoka instance.<br/>!msg', [
-          '!msg' => $djatoka_availible_message
-          ])),
+        '#title' => $this->t('djatoka URL'),
+        '#description' => $this->t('<strong>Externally accessible</strong> URL to the djatoka instance.<br/>') . $djatoka_availible_message,
         '#default_value' => $djatoka_url,
         '#ajax' => [
           'callback' => 'islandora_paged_content_admin_settings_form_djatoka_ajax_callback',
@@ -145,73 +131,72 @@ class Admin extends ConfigFormBase {
       'islandora_paged_content_sequence_number_field' => [
         '#access' => $solr_enabled,
         '#type' => 'textfield',
-        '#title' => t('Solr page sequence number field'),
-        '#description' => t('The page or sequence number of each page or image.'),
+        '#title' => $this->t('Solr page sequence number field'),
+        '#description' => $this->t('The page or sequence number of each page or image.'),
         '#default_value' => $get_default_value('islandora_paged_content_sequence_number_field', 'RELS_EXT_isSequenceNumber_literal_ms'),
       ],
       'islandora_paged_content_use_solr_for_dimensions' => [
         '#access' => $solr_enabled,
         '#type' => 'checkbox',
-        '#title' => t('Use Solr to derive pages and sequence numbers'),
+        '#title' => $this->t('Use Solr to derive pages and sequence numbers'),
         '#default_value' => $get_default_value('islandora_paged_content_use_solr_for_dimensions', FALSE),
       ],
       'islandora_paged_content_solr_width_field' => [
         '#access' => $solr_enabled,
         '#type' => 'textfield',
-        '#title' => t('Solr width dimension field'),
+        '#title' => $this->t('Solr width dimension field'),
         '#default_value' => $get_default_value('islandora_paged_content_solr_width_field', 'RELS_INT_width_literal_s'),
         '#states' => [
           'visible' => [
             ':input[name="islandora_paged_content_use_solr_for_dimensions"]' => [
-              'checked' => TRUE
-              ]
-            ]
+              'checked' => TRUE,
+            ],
           ],
+        ],
       ],
       'islandora_paged_content_solr_height_field' => [
         '#access' => $solr_enabled,
         '#type' => 'textfield',
-        '#title' => t('Solr height dimension field'),
+        '#title' => $this->t('Solr height dimension field'),
         '#default_value' => $get_default_value('islandora_paged_content_solr_height_field', 'RELS_INT_height_literal_s'),
         '#states' => [
           'visible' => [
             ':input[name="islandora_paged_content_use_solr_for_dimensions"]' => [
-              'checked' => TRUE
-              ]
-            ]
+              'checked' => TRUE,
+            ],
           ],
+        ],
       ],
       'islandora_paged_content_page_label' => [
         '#type' => 'checkbox',
-        '#title' => t('Set page labels to sequence numbers'),
-        '#description' => t('The sequence number of each page will be used to set its label.'),
+        '#title' => $this->t('Set page labels to sequence numbers'),
+        '#description' => $this->t('The sequence number of each page will be used to set its label.'),
         '#default_value' => $get_default_value('islandora_paged_content_page_label', FALSE),
       ],
       'islandora_paged_content_solr_results_alter' => [
         '#type' => 'fieldset',
-        '#title' => t('Solr Results Altering'),
+        '#title' => $this->t('Solr Results Altering'),
         'islandora_paged_content_hide_pages_solr' => [
           '#type' => 'checkbox',
-          '#title' => t('Hide Page Objects From Search Results'),
+          '#title' => $this->t('Hide Page Objects From Search Results'),
           '#default_value' => $get_default_value('islandora_paged_content_hide_pages_solr', FALSE),
         ],
         'islandora_paged_content_solr_fq' => [
           '#type' => 'textfield',
-          '#title' => t('Paged Content Solr Filter Query'),
-          '#description' => t('Enter a string representing a query to use to filter pages from Solr results.'),
+          '#title' => $this->t('Paged Content Solr Filter Query'),
+          '#description' => $this->t('Enter a string representing a query to use to filter pages from Solr results.'),
           '#default_value' => $get_default_value('islandora_paged_content_solr_fq', '-RELS_EXT_isPageOf_uri_ms:[* TO *]'),
           '#states' => [
             'invisible' => [
               ':input[name="islandora_paged_content_hide_pages_solr"]' => [
-                'checked' => FALSE
-                ]
-              ]
+                'checked' => FALSE,
+              ],
             ],
+          ],
         ],
       ],
     ];
-    return parent::buildForm($form, $form_state);
+    return $form;
   }
 
 }
-?>

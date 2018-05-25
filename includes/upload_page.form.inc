@@ -19,43 +19,43 @@
  *   An array containing the form to be rendered.
  */
 function islandora_paged_content_upload_page_form(array $form, array &$form_state, AbstractObject $parent) {
-  $get_default_value = function($name, $default) use(&$form_state) {
+  $get_default_value = function ($name, $default) use (&$form_state) {
     return isset($form_state['values'][$name]) ? $form_state['values'][$name] : $default;
   };
   $form_state['parent'] = $parent;
   $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
-  $extensions = array('tiff tif jp2 jpg jpeg');
-  $languages = array();
+  $extensions = ['tiff tif jp2 jpg jpeg'];
+  $languages = [];
   if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     module_load_include('inc', 'islandora_ocr', 'includes/utilities');
     $languages = islandora_ocr_get_enabled_tesseract_languages();
   }
   $default_language = in_array('eng', $languages) ? 'eng' : NULL;
 
-  $upload_form = array(
-    'file' => array(
+  $upload_form = [
+    'file' => [
       '#title' => t('Page'),
       '#type' => 'managed_file',
-      '#description' => t('Select an image to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', array('@size' => $upload_size, '@ext' => $extensions[0])),
+      '#description' => t('Select an image to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', ['@size' => $upload_size, '@ext' => $extensions[0]]),
       '#default_value' => $get_default_value('files', NULL),
       '#upload_location' => 'temporary://',
       '#required' => TRUE,
-      '#upload_validators' => array(
+      '#upload_validators' => [
         'file_validate_extensions' => $extensions,
-        'file_validate_size' => array($upload_size * 1024 * 1024),
-      ),
-    ),
-  );
+        'file_validate_size' => [$upload_size * 1024 * 1024],
+      ],
+    ],
+  ];
 
   if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
-    $upload_form['language'] = array(
+    $upload_form['language'] = [
       '#access' => \Drupal::moduleHandler()->moduleExists('islandora_ocr'),
       '#title' => t('Language'),
       '#type' => 'select',
       '#description' => t('Please select the language the page is written in.'),
       '#options' => $languages,
       '#default_value' => $get_default_value('language', $default_language),
-    );
+    ];
     $upload_form['ocr_ignored_derivatives'] = islandora_ocr_get_ignored_derivatives_fieldset();
   }
 

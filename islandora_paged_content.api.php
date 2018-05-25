@@ -11,6 +11,7 @@
  * @note
  *   The children content model PIDs currently map to an empty array as there
  *   may be room for expansion in the future.
+ *
  * @return array
  *   An array mapping the parent paged content model to an array of keyed
  *   content model arrays containing:
@@ -20,16 +21,16 @@
  *   - children: An array containing arrays of keyed content model children.
  */
 function hook_islandora_paged_content_content_model_registry() {
-  return array(
-    'somecmodel' => array(
-      'parents' => array(
+  return [
+    'somecmodel' => [
+      'parents' => [
         'islandora:bookCModel' => 'isMemberOfCollection',
-      ),
-      'children' => array(
-        'somecmodel' => array(),
-      ),
-    ),
-  );
+      ],
+      'children' => [
+        'somecmodel' => [],
+      ],
+    ],
+  ];
 }
 
 /**
@@ -42,7 +43,7 @@ function hook_islandora_paged_content_content_model_registry() {
  *
  * @see islandora_paged_content_manage_page_menu()
  */
-function hook_islandora_paged_content_page_management_tabs_alter(&$manage_tabs, $context) {
+function hook_islandora_paged_content_page_management_tabs_alter(array &$manage_tabs, array $context) {
   unset($manage_tabs['manage_page']['pdf']);
 }
 
@@ -56,6 +57,6 @@ function hook_islandora_paged_content_page_management_tabs_alter(&$manage_tabs, 
  *
  * @see islandora_paged_content_manage_pages_menu()
  */
-function hook_islandora_paged_content_pages_management_tabs_alter(&$manage_tabs, $context) {
+function hook_islandora_paged_content_pages_management_tabs_alter(array &$manage_tabs, array $context) {
   unset($manage_tabs['manage_pages']['pdf']);
 }

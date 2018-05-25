@@ -11,6 +11,8 @@
  *   Generating OCR and HOCR.
  */
 
+use \Drupal\Component\Serialization\Json;
+
 /**
  * Gets all the pages in the given paged content object.
  *
@@ -22,7 +24,7 @@
  *   number. Each an array containing info.
  */
 function islandora_paged_content_get_pages(AbstractObject $object) {
-  $pages = array();
+  $pages = [];
   // Try to use Solr first if enabled, or default to the RI if the Solr query
   // fails for some reason.
   if (\Drupal::moduleHandler()->moduleExists('islandora_solr') && \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_use_solr_for_dimensions')) {
@@ -81,7 +83,7 @@ EOQ;
 
   // Get rid of the "extra" info...
   $map = function ($o) {
-    foreach ($o as $key => &$info) {
+    foreach ($o as &$info) {
       $info = $info['value'];
     }
 
@@ -99,7 +101,7 @@ EOQ;
 
   // If we have some pages, combine our remapped results to produce an array
   // mapping pids to the values for that pid.
-  $pages = count($pids) ? array_combine($pids, $pages) : array();
+  $pages = count($pids) ? array_combine($pids, $pages) : [];
   return $pages;
 }
 
@@ -114,7 +116,7 @@ EOQ;
  *   number. Each an array containing info.
  */
 function islandora_paged_content_get_pages_solr(AbstractObject $object) {
-  $pages = array();
+  $pages = [];
   $qp = new islandoraSolrQueryProcessor();
   // @FIXME
 // // @FIXME
@@ -127,7 +129,7 @@ function islandora_paged_content_get_pages_solr(AbstractObject $object) {
 //   ));
 
   if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_hide_pages_solr')) {
-    $fq_to_remove = array(\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_fq'));
+    $fq_to_remove = [\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_fq')];
     $qp->solrParams['fq'] = array_diff($qp->solrParams['fq'], $fq_to_remove);
   }
   // @FIXME
@@ -139,23 +141,23 @@ function islandora_paged_content_get_pages_solr(AbstractObject $object) {
   $sequence_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_sequence_number_field');
   $height_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_height_field');
   $width_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_width_field');
-  $qp->solrParams['fl'] = implode(', ', array(
+  $qp->solrParams['fl'] = implode(', ', [
     'PID',
     $label_field,
     $sequence_field,
     $height_field,
     $width_field,
-  ));
+  ]);
   $qp->solrStart = 0;
   $qp->solrLimit = 100000;
   $qp->executeQuery(FALSE);
   if ($qp->islandoraSolrResult['response']['numFound'] > 0) {
     foreach ($qp->islandoraSolrResult['response']['objects'] as $page) {
-      $pages[$page['PID']] = array(
+      $pages[$page['PID']] = [
         'pid' => $page['PID'],
         'page' => (string) reset($page['solr_doc'][$sequence_field]),
         'label' => $page['object_label'],
-      );
+      ];
       if (isset($page['solr_doc'][$width_field])) {
         $pages[$page['PID']]['width'] = $page['solr_doc'][$width_field];
       }
@@ -316,8 +318,7 @@ function islandora_paged_content_set_relationship($relationships, $predicate_uri
  *   The enabled ingest derivatives.
  */
 function islandora_paged_content_get_enabled_ingest_derivatives($namespace) {
-  $default_derivatives = array_combine(array('pdf', 'image', 'ocr'), array('pdf', 'image', 'ocr'));
-  // @FIXME
+  $default_derivatives = array_combine(['pdf', 'image', 'ocr'], ['pdf', 'image', 'ocr']);
 // // @FIXME
 // // The correct configuration object could not be determined. You'll need to
 // // rewrite this call manually.
@@ -335,15 +336,14 @@ function islandora_paged_content_get_enabled_ingest_derivatives($namespace) {
  *   The datastream ID of the source for the given derivative.
  */
 function islandora_paged_content_get_page_derivative_source_id($dsid) {
-  // @todo Change TIFF to OBJ, when done testing.
-  $source_datastreams = array(
+  $source_datastreams = [
     'PDF' => 'OBJ',
     'OCR' => 'OBJ',
     'HOCR' => 'OBJ',
     'TN' => 'OBJ',
     'JPG' => 'OBJ',
     'JP2' => 'OBJ',
-  );
+  ];
   return $source_datastreams[$dsid];
 }
 
@@ -405,7 +405,7 @@ function islandora_paged_content_get_page_derivative_source(AbstractObject $obje
  */
 function islandora_paged_content_can_derive(AbstractObject $object, $dsid) {
   $can_derive = FALSE;
-  $to_derive = array(
+  $to_derive = [
     'islandora:newspaperCModel',
     'islandora:bookCModel',
     'islandora:pageCModel',
@@ -413,16 +413,16 @@ function islandora_paged_content_can_derive(AbstractObject $object, $dsid) {
     'islandora:newspaperPageCModel',
     'islandora:manuscriptCModel',
     'islandora:manuscriptPageCModel',
-  );
+  ];
   if (array_intersect($to_derive, $object->models)) {
-    $check_function = array(
+    $check_function = [
       'PDF' => 'islandora_paged_content_can_create_pdf',
       'OCR' => 'islandora_ocr_can_derive_ocr',
       'HOCR' => 'islandora_ocr_can_derive_ocr',
       'TN' => 'islandora_paged_content_can_create_images',
       'JP2' => 'islandora_paged_content_can_create_images',
       'JPG' => 'islandora_paged_content_can_create_images',
-    );
+    ];
 
     if (isset($check_function[$dsid])) {
       if ($dsid == "OCR" || $dsid == 'HOCR') {
@@ -504,14 +504,15 @@ function islandora_paged_content_pdf_combine(array $files, $out) {
   $gs = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_gs');
   $files = implode(' ', $files);
   $command = "{$gs} -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile={$out} {$files}";
-  $output = array(); $ret = 0;
+  $output = [];
+  $ret = 0;
   exec($command, $output, $ret);
   if ($ret != 0) {
-    $variables = array(
+    $variables = [
       '@ret' => $ret,
       '@command' => $command,
       '!output' => implode('<br/>', $output),
-    );
+    ];
     \Drupal::logger('islandora_paged_content')->error('GhostScript failed to combine PDFs.<br/>Error: @ret<br/>Command: @command <br/>Output !output', []);
     return FALSE;
   }
@@ -574,7 +575,7 @@ function islandora_paged_content_ocr_combine(array $files, $out) {
  * @return bool
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_paged_content_page_derive_pdf_datastream(AbstractObject $object, array $options = array('-compress' => 'LZW')) {
+function islandora_paged_content_page_derive_pdf_datastream(AbstractObject $object, array $options = ['-compress' => 'LZW']) {
   $pdf_file = islandora_paged_content_page_derive_pdf($object, $options);
   if (!$pdf_file) {
     return FALSE;
@@ -595,7 +596,7 @@ function islandora_paged_content_page_derive_pdf_datastream(AbstractObject $obje
  * @return string
  *   The absolute path to the derived file if successful, FALSE otherwise.
  */
-function islandora_paged_content_page_derive_pdf(AbstractObject $object, array $options = array('-compress' => 'LZW')) {
+function islandora_paged_content_page_derive_pdf(AbstractObject $object, array $options = ['-compress' => 'LZW']) {
   if (!islandora_paged_content_can_derive($object, 'PDF')) {
     return FALSE;
   }
@@ -625,15 +626,15 @@ function islandora_paged_content_convert_to_pdf($image_file, array $options) {
   $options = implode(' ', $options);
   $pdf_file = "$image_file.pdf";
   $command_args = "{$options} {$image_file} {$pdf_file}";
-  $output = array(); $ret = 0;
+  $output = [];
+  $ret = 0;
   if (_imagemagick_convert_exec($command_args, $output, $ret) !== TRUE) {
-    $message = 'ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Command: @command<br/>Output: !output';
-    $variables = array(
+    $variables = [
       '@ret' => $ret,
       '@command' => "convert $command_args",
-      '!output' => implode('<br/>', $output),
-    );
-    \Drupal::logger('islandora_paged_content')->error('ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Command: @command<br/>Output: !output', []);
+      '@output' => implode('<br/>', $output),
+    ];
+    \Drupal::logger('islandora_paged_content')->error('ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Command: @command<br/>Output: @output', []);
     return FALSE;
   }
   return $pdf_file;
@@ -826,7 +827,7 @@ function islandora_paged_content_apply_language_relationship_to_options(Abstract
  *   If this function should fail for some reason all the fields will be 0.
  */
 function islandora_paged_content_get_page_dimensions(AbstractObject $object) {
-  $dimensions = array('width' => 0, 'height' => 0);
+  $dimensions = ['width' => 0, 'height' => 0];
   $metadata = islandora_paged_content_get_technical_metadata($object);
   $metadata = $metadata ? $metadata : islandora_paged_content_get_page_metadata_from_djatoka($object->id);
   return $metadata ? array_intersect_key($metadata, $dimensions) : $dimensions;
@@ -867,7 +868,7 @@ function islandora_paged_content_get_technical_metadata(AbstractObject $object) 
     $width = (int) array_pop($width_xpath);
     $height_xpath = $doc->xpath('/ns:fits/ns:metadata/ns:image/ns:imageHeight');
     $height = (int) array_pop($height_xpath);
-    $metadata = array('width' => $width, 'height' => $height);
+    $metadata = ['width' => $width, 'height' => $height];
   }
   file_unmanaged_delete($file);
   return $metadata;
@@ -918,14 +919,14 @@ function islandora_paged_content_get_page_metadata_from_djatoka($object_id) {
   // @FIXME
 // drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
 // with Drupal core.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/1862446
 // @see http://docs.guzzlephp.org/en/latest
 // $request = drupal_http_request($djatoka_url);
 
   if ($request->code == '200') {
-    return \Drupal\Component\Serialization\Json::decode($request->data);
+    return Json::decode($request->data);
   }
   return FALSE;
 }
@@ -942,40 +943,40 @@ function islandora_paged_content_get_page_metadata_from_djatoka($object_id) {
 function islandora_paged_content_paged_object_derivatives($context) {
   $derive = islandora_paged_content_get_enabled_ingest_derivatives($context);
   $paged_content_module_path = drupal_get_path('module', 'islandora_paged_content');
-  $derivatives = array();
+  $derivatives = [];
 
   if ($derive['image']) {
-    $derivatives[] = array(
+    $derivatives[] = [
       'source_dsid' => NULL,
       'destination_dsid' => 'TN',
-      'function' => array('islandora_paged_content_derive_thumbnail_of_parent'),
+      'function' => ['islandora_paged_content_derive_thumbnail_of_parent'],
       'file' => "$paged_content_module_path/includes/derivatives.inc",
-    );
+    ];
   }
   if ($derive['pdf']) {
     $derivatives = array_merge(
       $derivatives,
-      array(
-        array(
+      [
+        [
           'source_dsid' => NULL,
           'destination_dsid' => 'PDF',
-          'function' => array('islandora_paged_content_aggregate_pdf_derivative'),
+          'function' => ['islandora_paged_content_aggregate_pdf_derivative'],
           'file' => "$paged_content_module_path/includes/derivatives.inc",
-        ),
-      )
+        ],
+      ]
     );
   }
   if ($derive['ocr']) {
     $derivatives = array_merge(
       $derivatives,
-      array(
-        array(
+      [
+        [
           'source_dsid' => NULL,
           'destination_dsid' => 'OCR',
-          'function' => array('islandora_paged_content_aggregate_ocr_derivative'),
+          'function' => ['islandora_paged_content_aggregate_ocr_derivative'],
           'file' => "$paged_content_module_path/includes/derivatives.inc",
-        ),
-      )
+        ],
+      ]
     );
   }
   return $derivatives;
@@ -995,71 +996,71 @@ function islandora_paged_content_page_derivatives($context) {
   $paged_content_module_path = drupal_get_path('module', 'islandora_paged_content');
   $ocr_module_path = drupal_get_path('module', 'islandora_ocr');
   $derive = islandora_paged_content_get_enabled_ingest_derivatives($context);
-  $derivatives = array();
+  $derivatives = [];
 
   if (isset($derive['pdf']) && $derive['pdf']) {
-    $derivatives[] = array(
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'PDF',
-      'function' => array('islandora_paged_content_derivatives_pdf'),
+      'function' => ['islandora_paged_content_derivatives_pdf'],
       'file' => "$paged_content_module_path/includes/derivatives.inc",
-    );
+    ];
   }
 
   if (isset($derive['ocr']) && $derive['ocr']) {
-    $derivatives[] = array(
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'OCR',
       'weight' => 0,
-      'function' => array('islandora_ocr_derive_ocr'),
+      'function' => ['islandora_ocr_derive_ocr'],
       'file' => "$ocr_module_path/includes/derivatives.inc",
-    );
-    $derivatives[] = array(
+    ];
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'HOCR',
       'weight' => 0,
-      'function' => array('islandora_ocr_derive_hocr'),
+      'function' => ['islandora_ocr_derive_hocr'],
       'file' => "$ocr_module_path/includes/derivatives.inc",
-    );
-    $derivatives[] = array(
+    ];
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => NULL,
       'weight' => 1,
-      'function' => array('islandora_ocr_remove_generating_rels_ext_statements'),
+      'function' => ['islandora_ocr_remove_generating_rels_ext_statements'],
       'file' => "$ocr_module_path/includes/derivatives.inc",
-    );
+    ];
   }
   if (isset($derive['image']) && $derive['image']) {
-    $derivatives[] = array(
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'JP2',
-      'function' => array('islandora_large_image_create_jp2_derivative'),
+      'function' => ['islandora_large_image_create_jp2_derivative'],
       'file' => "$large_image_module_path/includes/derivatives.inc",
-    );
-    $derivatives[] = array(
+    ];
+    $derivatives[] = [
       'source_dsid' => 'JP2',
       'destination_dsid' => NULL,
-      'function' => array('islandora_paged_content_add_dimensions_relationships'),
+      'function' => ['islandora_paged_content_add_dimensions_relationships'],
       'file' => "$paged_content_module_path/includes/utilities.inc",
-    );
-    $derivatives[] = array(
+    ];
+    $derivatives[] = [
       'source_dsid' => 'TN',
       'destination_dsid' => NULL,
-      'function' => array('islandora_paged_content_derive_thumbnail_on_parent'),
+      'function' => ['islandora_paged_content_derive_thumbnail_on_parent'],
       'file' => "$paged_content_module_path/includes/derivatives.inc",
-    );
-    $derivatives[] = array(
+    ];
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'TN',
-      'function' => array('islandora_large_image_create_tn_derivative'),
+      'function' => ['islandora_large_image_create_tn_derivative'],
       'file' => "$large_image_module_path/includes/derivatives.inc",
-    );
-    $derivatives[] = array(
+    ];
+    $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'JPG',
-      'function' => array('islandora_large_image_create_jpg_derivative'),
+      'function' => ['islandora_large_image_create_jpg_derivative'],
       'file' => "$large_image_module_path/includes/derivatives.inc",
-    );
+    ];
   }
 
   return $derivatives;
@@ -1076,7 +1077,7 @@ function islandora_paged_content_page_derivatives($context) {
  */
 function islandora_paged_content_parse_pages_to_move($pages_to_move) {
   $ranges = explode(',', $pages_to_move);
-  $page_numbers_to_move = array();
+  $page_numbers_to_move = [];
   foreach ($ranges as $range) {
     $dash_index = strpos($range, '-');
     if ($dash_index) {
@@ -1144,15 +1145,15 @@ function islandora_paged_content_extract_text_from_pdf($uri, $offset, $layout = 
 
   // Need to link the file because of UTF-8 encoding.
   $copy = islandora_paged_content_create_clean_link($uri, 'full');
-  $command = format_string($base_command, array(
+  $command = strtr($base_command, [
     '!pdftotext_path' => $pdftotext,
     '!layout' => $layout ? '-layout' : '',
     '!offset' => $offset,
     '!pdf_uri' => escapeshellarg(\Drupal::service("file_system")->realpath($copy)),
     '!output_file' => \Drupal::service("file_system")->realpath($output_file),
     '!raw' => $raw_text ? '-raw' : '',
-  ));
-  $output = array();
+  ]);
+  $output = [];
   $ret = 0;
   exec(escapeshellcmd($command), $output, $ret);
   \Drupal::service("file_system")->unlink($copy);
@@ -1182,7 +1183,7 @@ function islandora_paged_content_length_of_pdf($uri) {
   // Need to link the file because of UTF-8 encoding.
   $copy = islandora_paged_content_create_clean_link($uri, 'length');
   $command = escapeshellarg($pdfinfo) . ' ' . escapeshellarg(\Drupal::service("file_system")->realpath($copy));
-  $output = array();
+  $output = [];
   $ret = 0;
   exec(escapeshellcmd($command), $output, $ret);
   \Drupal::service("file_system")->unlink($copy);
@@ -1234,15 +1235,15 @@ function islandora_paged_content_extract_tiff_from_pdf($uri, $offset, $device, $
   else {
     $base_command = '!gs_path -q -dNOPAUSE -dBATCH -sDEVICE=!device -sCompression=lzw -sOutputFile=!output_file -r!resolution -dFirstPage=!offset -dLastPage=!offset !pdf_uri';
   }
-  $command = format_string($base_command, array(
+  $command = format_string($base_command, [
     '!gs_path' => escapeshellarg($gs),
     '!device' => $device,
     '!offset' => $offset,
     '!output_file' => \Drupal::service("file_system")->realpath($output_file),
     '!resolution' => (int) $resolution,
     '!pdf_uri' => escapeshellarg(\Drupal::service("file_system")->realpath($copy)),
-  ));
-  $output = array();
+  ]);
+  $output = [];
   $ret = 0;
   exec(escapeshellcmd($command), $output, $ret);
   \Drupal::service("file_system")->unlink($copy);
@@ -1275,13 +1276,13 @@ function islandora_paged_content_chop_pdf($uri, $offset) {
   // Need to link the file because of UTF-8 encoding.
   $copy = islandora_paged_content_create_clean_link($uri, 'pdfforgschop');
   $base_command = '!gs_path -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=!output_file -dFirstPage=!offset -dLastPage=!offset !pdf_uri';
-  $command = format_string($base_command, array(
+  $command = strtr($base_command, [
     '!gs_path' => escapeshellarg($gs),
     '!offset' => $offset,
     '!output_file' => \Drupal::service("file_system")->realpath($output_file),
     '!pdf_uri' => escapeshellarg(\Drupal::service("file_system")->realpath($copy)),
-  ));
-  $output = array();
+  ]);
+  $output = [];
   $ret = 0;
   exec(escapeshellcmd($command), $output, $ret);
   \Drupal::service("file_system")->unlink($copy);
@@ -1410,10 +1411,10 @@ function islandora_paged_content_create_clean_link($uri, $prefix = 'clean', $des
     return $clean;
   }
   else {
-    \Drupal::logger('islandora_paged_content')->notice('Unable to create link in @dest to "@uri"; copying "@uri" to @dest.', array(
+    \Drupal::logger('islandora_paged_content')->notice('Unable to create link in @dest to "@uri"; copying "@uri" to @dest.', [
       '@dest' => $dest,
       '@uri' => $uri,
-    ));
+    ]);
     return file_unmanaged_copy($uri, $dest);
   }
 }

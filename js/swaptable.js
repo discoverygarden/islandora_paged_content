@@ -1,8 +1,13 @@
+/**
+ * @file
+ * JS to enable the swaptable.
+ */
+
 (function ($) {
   "use strict";
 
   /**
-   * jQuery Helper function for determining order.
+   * Helper function for determining order.
    *
    * Very dumb method doesn't test for the same element or not siblings etc.
    */
@@ -11,7 +16,7 @@
   };
 
   /**
-   * jQuery Helper function for determining order.
+   * Helper function for determining order.
    *
    * Very dumb method doesn't test for the same element or not siblings etc.
    */
@@ -69,7 +74,7 @@
     // There is a problem in that the overview display will hijack any link that
     // links to a admin section of the site so even if we prevent the default
     // event on click the overview panel will perform the request anyways.
-    $('.pager a', this.table).each(function() {
+    $('.pager a', this.table).each(function () {
       // Store the page parameters for later loading.
       var results = this.href.match('\\?.*page=([^&]*)');
       if ($.isArray(results) && results[1] !== undefined) {
@@ -119,7 +124,8 @@
       .click(function () {
         if ($.cookie('Drupal.swapTable.showOriginal') === 1) {
           self.hideColumns();
-        } else {
+        }
+        else {
           self.showColumns();
         }
         return false;
@@ -300,11 +306,13 @@
     if (event.shiftKey && !event.metaKey && last) {
       list = $(row).isAfter($(last)) ? $(last).nextUntil(id) : $(last).prevUntil(id);
       list.add(row).addClass('ui-selected');
-    } else if (event.metaKey) {
+    }
+    else if (event.metaKey) {
       // Select/Deselect only the current selection.
       $(row).toggleClass('ui-selected');
       $.data(table, 'last', row);
-    } else {
+    }
+    else {
       // Select only the given row.
       $(row).addClass('ui-selected').siblings().removeClass('ui-selected');
       $.data(table, 'last', row);
@@ -342,7 +350,7 @@
     // Show the currently selected rows only if they belong to the other table.
     this.getSelectedElements(table, selected).hide();
     $('tr:hidden', otherTable).show();
-    // Show the place holder on only the current table
+    // Show the place holder on only the current table.
     $('tr.ui-placeholder', table).show();
     $('tr.ui-placeholder', otherTable).hide();
   };
@@ -376,7 +384,8 @@
       list = $('tbody > tr:visible', table);
     if (list.index(row) > list.index(placeholder)) {
       $(row).after(placeholder);
-    } else {
+    }
+    else {
       $(row).before(placeholder);
     }
   };
@@ -423,11 +432,13 @@
         expires: 365
       });
       this.hideColumns();
-    } else {
+    }
+    else {
       // Check cookie value and show/hide weight columns accordingly.
       if ($.cookie('Drupal.swapTable.showOriginal') === 1) {
         this.showColumns();
-      } else {
+      }
+      else {
         this.hideColumns();
       }
     }
@@ -435,6 +446,7 @@
 
   /**
    * Hide the columns containing weight/parent form elements.
+   *
    * Undo showColumns().
    */
   Drupal.swapTable.prototype.hideColumns = function () {
@@ -451,7 +463,8 @@
   };
 
   /**
-   * Show the columns containing weight/parent form elements
+   * Show the columns containing weight/parent form elements.
+   *
    * Undo hideColumns().
    */
   Drupal.swapTable.prototype.showColumns = function () {

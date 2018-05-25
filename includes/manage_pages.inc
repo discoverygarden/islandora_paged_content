@@ -32,31 +32,31 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
   // @FIXME
 // drupal_set_title() has been removed. There are now a few ways to set the title
 // dynamically, depending on the situation.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2067859
 // drupal_set_title($object->label);
 
-  $manage_tabs = array(
-    'manage_pages' => array(
+  $manage_tabs = [
+    'manage_pages' => [
       '#type' => 'vertical_tabs',
-      'pdf' => array(
+      'pdf' => [
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Create PDF'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_pages_pdf_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
-      ),
-      'ocr' => array(
+      ],
+      'ocr' => [
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Perform OCR'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_pages_ocr_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'images' => array(
+      ],
+      'images' => [
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Create Images'),
         '#type' => 'fieldset',
@@ -64,50 +64,50 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
         'form_2' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_pages_images_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'page_progression' => array(
+      ],
+      'page_progression' => [
         '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
         '#title' => t('Page Progression'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_progression_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'viewinghint' => array(
+      ],
+      'viewinghint' => [
         '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
         '#title' => t('Page display mode'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_viewing_hint_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'hascover' => array(
+      ],
+      'hascover' => [
         '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
         '#title' => t('Book Cover?'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_hascover_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'sequence' => array(
+      ],
+      'sequence' => [
         '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
         '#title' => t('Reorder Pages'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_pages_sequences_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         '#access' => islandora_object_access(ISLANDORA_PURGE, $object),
         '#title' => t('Delete Pages'),
         '#type' => 'fieldset',
         'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_pages_delete_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
-      ),
-    ),
-  );
-  $context = array('object' => $object);
+      ],
+    ],
+  ];
+  $context = ['object' => $object];
   \Drupal::moduleHandler()->alter('islandora_paged_content_pages_management_tabs', $manage_tabs, $context);
   return $manage_tabs;
 }
@@ -130,23 +130,23 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
 function islandora_paged_content_manage_pages_pdf_form(array $form, array &$form_state, AbstractObject $object) {
   $form_state['object'] = $object;
   $can_derive = islandora_paged_content_can_create_pdf() && islandora_paged_content_can_combine_pdf();
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t('You must have both <b>ImageMagick</b> and <b>GhostScript</b> installed to create/combine PDF files.<br/> This will also update the PDF datastreams for each Page object.'),
-    ),
-    'dpi' => array(
+    ],
+    'dpi' => [
       '#type' => 'select',
       '#title' => t('DPI - Dots Per Inch'),
       '#description' => t('Set the DPI for the generated PDF. The higher the resolution the longer the process will take.'),
-      '#options' => array_combine(array('72', '96', '300', '600'), array('72', '96', '300', '600')),
-    ),
-    'submit' => array(
+      '#options' => array_combine(['72', '96', '300', '600'], ['72', '96', '300', '600']),
+    ],
+    'submit' => [
       '#disabled' => !$can_derive,
       '#type' => 'submit',
       '#value' => t('Create PDF'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -163,10 +163,10 @@ function islandora_paged_content_manage_pages_pdf_form(array $form, array &$form
 function islandora_paged_content_manage_pages_pdf_form_submit(array $form, array &$form_state) {
   $object = $form_state['object'];
   $pages = array_keys(islandora_paged_content_get_pages($object));
-  $options = array(
+  $options = [
     '-density' => $form_state['values']['dpi'],
     '-compress' => 'LZW',
-  );
+  ];
   $batch = islandora_paged_content_create_pdf_batch($object, $pages, $options);
   batch_set($batch);
 }
@@ -187,38 +187,38 @@ function islandora_paged_content_manage_pages_pdf_form_submit(array $form, array
 function islandora_paged_content_manage_pages_ocr_form(array $form, array &$form_state, AbstractObject $object) {
   $form_state['object'] = $object;
   $can_derive = FALSE;
-  $languages = array();
+  $languages = [];
   unset($languages['no_ocr']);
   if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     module_load_include('inc', 'islandora_ocr', 'includes/utilities');
     $can_derive = islandora_ocr_can_derive_ocr();
     $languages = islandora_ocr_get_enabled_tesseract_languages();
   }
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t('You must have <b>Tesseract</b> installed to perform OCR.<br/> This will update the OCR and HOCR datastreams for each Page object.'),
-    ),
-    'language' => array(
+    ],
+    'language' => [
       '#access' => $can_derive,
       '#title' => t('Language'),
       '#type' => 'select',
       '#description' => t('Please select the language the pages are written in.'),
       '#options' => $languages,
-    ),
-    'aggregate_ocr' => array(
+    ],
+    'aggregate_ocr' => [
       '#access' => $can_derive,
       '#type' => 'checkbox',
       '#title' => t('Aggregate OCR to the Parent'),
       '#description' => t('Check this to aggregate a consolidated OCR datastream generated from each page and append it to the current object.'),
       '#default_value' => FALSE,
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#disabled' => !$can_derive,
       '#type' => 'submit',
       '#value' => t('Create OCR'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -232,11 +232,11 @@ function islandora_paged_content_manage_pages_ocr_form(array $form, array &$form
 function islandora_paged_content_manage_pages_ocr_form_submit(array $form, array &$form_state) {
   $object = $form_state['object'];
   $pages = array_keys(islandora_paged_content_get_pages($object));
-  $options = array(
+  $options = [
     'language' => $form_state['values']['language'],
     'preprocess' => FALSE,
     'aggregate_ocr' => $form_state['values']['aggregate_ocr'],
-  );
+  ];
   $batch = islandora_paged_content_create_ocr_batch($object, $pages, $options);
   batch_set($batch);
 }
@@ -256,17 +256,17 @@ function islandora_paged_content_manage_pages_ocr_form_submit(array $form, array
  */
 function islandora_paged_content_manage_pages_thumbnail_form(array $form, array &$form_state, AbstractObject $object) {
   $form_state['object'] = $object;
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t("Update the thumbnail image. The book must have pages, and the first page must have a TN datastream."),
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#disabled' => !islandora_paged_content_can_update_paged_content_thumbnail($object),
       '#type' => 'submit',
       '#value' => t('Update Thumbnail'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -302,17 +302,17 @@ function islandora_paged_content_manage_pages_thumbnail_form_submit(array $form,
 function islandora_paged_content_manage_pages_images_form(array $form, array &$form_state, AbstractObject $object) {
   $form_state['object'] = $object;
   $can_derive = islandora_paged_content_can_create_images();
-  return array(
-    'description' => array(
+  return [
+    'description' => [
       '#type' => 'item',
       '#description' => t('You must have the <b>Large Image Solution Pack</b> installed to create image derivatives.<br/> This will update the TN, JPG and JP2 datastreams for each page object.'),
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#disabled' => !$can_derive,
       '#type' => 'submit',
       '#value' => t('Create Images'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -349,7 +349,7 @@ function islandora_paged_content_manage_pages_sequences_form(array $form, array 
   // ajax callback.
   if (!isset($form_state['rows'])) {
     $pages = islandora_paged_content_get_pages($object);
-    $rows = array();
+    $rows = [];
     foreach ($pages as $page) {
       $id = $page['pid'];
       $url = "islandora/object/{$id}";
@@ -358,8 +358,8 @@ function islandora_paged_content_manage_pages_sequences_form(array $form, array 
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // $rows[$id] = array(
 //         'tn' => array(
@@ -379,42 +379,42 @@ function islandora_paged_content_manage_pages_sequences_form(array $form, array 
     }
     $form_state['rows'] = $rows;
   }
-  return array(
-    'table' => array(
+  return [
+    'table' => [
       '#type' => 'swaptable',
-      '#header' => array(
+      '#header' => [
         t('Thumbnail'),
         t('Label'),
-      ),
+      ],
       '#rows' => $form_state['rows'],
-    ),
-    'quick_reorder' => array(
+    ],
+    'quick_reorder' => [
       '#type' => 'fieldset',
       '#title' => t('Quick Reorder'),
-      'pages_to_move' => array(
+      'pages_to_move' => [
         '#type' => 'textfield',
         '#title' => t('Move Pages:'),
         '#description' => t("Must follow the form '1, 2-4,5'."),
-      ),
-      'pages_insert_point' => array(
+      ],
+      'pages_insert_point' => [
         '#type' => 'textfield',
         '#title' => t('Insert After:'),
-      ),
-      'submit' => array(
-        '#validate' => array('islandora_paged_content_quick_reorder_validate'),
+      ],
+      'submit' => [
+        '#validate' => ['islandora_paged_content_quick_reorder_validate'],
         '#type' => 'submit',
-        '#submit' => array('islandora_paged_content_quick_reorder_submit'),
+        '#submit' => ['islandora_paged_content_quick_reorder_submit'],
         '#value' => t('Go'),
-      ),
-    ),
-    'actions' => array(
+      ],
+    ],
+    'actions' => [
       '#type' => 'actions',
-      'submit' => array(
+      'submit' => [
         '#type' => 'submit',
         '#value' => t('Save Changes'),
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**
@@ -466,8 +466,8 @@ function islandora_paged_content_quick_reorder_submit($form, &$form_state) {
   // Build page array without changed pids.
   $book = islandora_object_load($form_state['pid']);
   $raw_pages = islandora_paged_content_get_pages($book);
-  $pages = array();
-  $page_pids_to_move = array();
+  $pages = [];
+  $page_pids_to_move = [];
   foreach ($raw_pages as $page_pid => $page_info) {
     if (in_array($page_info['page'], $page_numbers_to_move)) {
       $page_pids_to_move[] = $page_pid;
@@ -521,26 +521,26 @@ function islandora_paged_content_manage_pages_sequences_form_submit(array $form,
 function islandora_paged_content_manage_pages_delete_form(array $form, array &$form_state, AbstractObject $object) {
   $form_state['object'] = $object;
   $pages = islandora_paged_content_get_pages($object);
-  return array(
-    'table' => array(
+  return [
+    'table' => [
       '#type' => 'tableselect',
-      '#header' => array(
+      '#header' => [
         'pid' => t('PID'),
         'page' => t('Sequence Number'),
         'label' => t('Label'),
-      ),
+      ],
       '#options' => $pages,
       '#multiple' => TRUE,
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#type' => 'submit',
       '#value' => t('Delete Selected Pages'),
-    ),
-    'item' => array(
+    ],
+    'item' => [
       '#type' => 'item',
       '#markup' => t('Note: Make sure to re-order pages after deleting pages to keep the numerical index in sequence for search term highlighting.'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -605,20 +605,20 @@ function islandora_paged_content_zipped_upload_form(array $form, array &$form_st
   $current_pages = islandora_paged_content_get_pages($object);
   $last_page_number = count($current_pages);
   $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
-  $extensions = array('zip');
-  $form = array();
-  $message = t("This sequence currently has @count pages. Additional pages will be appended to the end of the sequence by default. !break", array("@count" => $last_page_number, '!break' => '<br />'));
-  $message .= t("Choose a number lower than @count to insert page(s) at a specific location in the sequence.", array("@count" => $last_page_number, '!break' => '<br />'));
+  $extensions = ['zip'];
+  $form = [];
+  $message = t("This sequence currently has @count pages. Additional pages will be appended to the end of the sequence by default. !break", ["@count" => $last_page_number, '!break' => '<br />']);
+  $message .= t("Choose a number lower than @count to insert page(s) at a specific location in the sequence.", ["@count" => $last_page_number, '!break' => '<br />']);
 
   if (\Drupal::moduleHandler()->moduleExists('islandora_ocr') && in_array('ocr', $derivatives)) {
     module_load_include('inc', 'islandora_ocr', 'includes/utilities');
     $languages = islandora_ocr_get_enabled_tesseract_languages();
-    $form['language'] = array(
+    $form['language'] = [
       '#title' => t('Language'),
       '#type' => 'select',
       '#description' => t('Please select the language the page is written in.'),
       '#options' => $languages,
-    );
+    ];
     if (in_array('English', $languages)) {
       $form['language']['#default_value'] = 'eng';
     }
@@ -626,50 +626,50 @@ function islandora_paged_content_zipped_upload_form(array $form, array &$form_st
   }
 
   if ($current_pages) {
-    $form['insertion_point'] = array(
+    $form['insertion_point'] = [
       '#type' => 'textfield',
       '#title' => t('Last sequence number'),
       '#default_value' => $last_page_number,
       '#description' => \Drupal\Component\Utility\Xss::filterAdmin($message),
       '#size' => 5,
-    );
+    ];
   }
 
   // Value behaves more consistently when passed as a string.
-  $form['current_pages'] = array(
+  $form['current_pages'] = [
     '#type' => 'hidden',
     '#value' => serialize($current_pages),
-  );
+  ];
 
-  $form['file'] = array(
+  $form['file'] = [
     '#title' => t('Compressed images file.'),
     '#type' => 'managed_file',
     '#required' => TRUE,
     '#description' => t('Select file to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', array('@size' => $upload_size, '@ext' => $extensions[0])),
     '#default_value' => isset($form_state['values']['files']) ? $form_state['values']['files'] : NULL,
     '#upload_location' => 'temporary://',
-    '#upload_validators' => array(
+    '#upload_validators' => [
       'file_validate_extensions' => $extensions,
-      'file_validate_size' => array($upload_size * 1024 * 1024),
-    ),
-  );
+      'file_validate_size' => [$upload_size * 1024 * 1024],
+    ],
+  ];
 
-  $form['pid'] = array(
+  $form['pid'] = [
     '#type' => 'hidden',
     '#value' => $pid,
-  );
-  $form['allowed_extensions'] = array(
+  ];
+  $form['allowed_extensions'] = [
     '#type' => 'hidden',
     '#value' => $allowed_extensions,
-  );
-  $form['model'] = array(
+  ];
+  $form['model'] = [
     '#type' => 'hidden',
     '#value' => $model,
-  );
-  $form['submit'] = array(
+  ];
+  $form['submit'] = [
     '#type' => 'submit',
     '#value' => t('Add files'),
-  );
+  ];
   return $form;
 }
 
@@ -699,7 +699,7 @@ function islandora_paged_content_zipped_upload_form_submit(array $form, array &$
   $current_pages = unserialize($form_state['values']['current_pages']);
 
   $insertion_point = isset($form_state['values']['insertion_point']) ? (int) $form_state['values']['insertion_point'] : 0;
-  $pages_to_renumber = array();
+  $pages_to_renumber = [];
   foreach ($current_pages as $current_page) {
     if ((int) $current_page['page'] > $insertion_point) {
       $pages_to_renumber[] = $current_page;
@@ -757,15 +757,15 @@ function islandora_paged_content_zipped_upload_form_submit(array $form, array &$
   }
 
   if ($add_count > 0) {
-    $batch = array(
+    $batch = [
       'title' => ucfirst($status_message),
       'progress_message' => t('Completed @current operations out of @total.'),
-      'operations' => array(),
+      'operations' => [],
       'file' => drupal_get_path('module', 'islandora_paged_content') . '/includes/manage_pages.inc',
       'finished' => 'islandora_paged_content_zipped_upload_ingest_finished',
-    );
+    ];
     $file_count = count($files_to_add);
-    $config = array(
+    $config = [
       'pid' => $pid,
       'destination_dir' => $destination_dir,
       'namespace' => $namespace,
@@ -774,26 +774,26 @@ function islandora_paged_content_zipped_upload_form_submit(array $form, array &$
       'file_count' => $file_count,
       'book_label' => $book_label,
       'language' => isset($form_state['values']['language']) ? $form_state['values']['language'] : 'eng',
-      'ignored_derivs' => array(
+      'ignored_derivs' => [
         'ocr' => isset($form_state['values']['ignore_ocr']) ? $form_state['values']['ignore_ocr'] : FALSE,
         'hocr' => isset($form_state['values']['ignore_hocr']) ? $form_state['values']['ignore_hocr'] : FALSE,
-      ),
-    );
+      ],
+    ];
     if (isset($pages_to_renumber[0])) {
       foreach ($pages_to_renumber as $page) {
-        $batch['operations'][] = array(
+        $batch['operations'][] = [
           'islandora_paged_content_content_insert_sequence_gap',
-          array($page, $file_count),
-        );
+          [$page, $file_count],
+        ];
       }
     }
     foreach ($files_to_add as $image) {
       $config['page_number'] = ++$insertion_point;
       $config['image'] = $image;
-      $batch['operations'][] = array(
+      $batch['operations'][] = [
         'islandora_paged_content_add_pages',
-        array($repository, $config, $destination_dir),
-      );
+        [$repository, $config, $destination_dir],
+      ];
     }
 
     batch_set($batch);
@@ -881,15 +881,15 @@ function islandora_paged_content_insert_sequence_gap($page_to_reindex, $offset) 
 function islandora_paged_content_zipped_upload_ingest_finished($success, $results, $operations) {
   file_unmanaged_delete_recursive($results['pages_directory']);
   if ($success) {
-    drupal_set_message(t('Successfully added @pages pages to @label.', array(
+    drupal_set_message(t('Successfully added @pages pages to @label.', [
       '@pages' => $results['file_count'],
       '@label' => $results['book_label'],
-    )));
+    ]));
   }
   else {
-    drupal_set_message(t('Problems were encountered while trying to add pages to @label. Please contact an administrator or check the logs for details.', array(
+    drupal_set_message(t('Problems were encountered while trying to add pages to @label. Please contact an administrator or check the logs for details.', [
       '@label' => $results['book_label'],
-    )));
+    ]));
   }
 }
 
@@ -910,21 +910,21 @@ function islandora_paged_content_manage_page_progression_form(array $form, array
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $page_progression = islandora_paged_content_get_page_progression($object);
   $form_state['pid'] = $object->id;
-  return array(
-    'page_progression' => array(
+  return [
+    'page_progression' => [
       '#type' => 'radios',
       '#title' => t('Page Progression'),
-      '#options' => array(
+      '#options' => [
         'lr' => t('Left-to-Right'),
         'rl' => t('Right-to-Left'),
-      ),
+      ],
       '#default_value' => $page_progression,
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#type' => 'submit',
       '#value' => t('Set page progression'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -960,23 +960,23 @@ function islandora_paged_content_manage_viewing_hint_form(array $form, array &$f
   $viewing_hint = islandora_paged_content_get_viewing_hint($object);
   $viewing_hint = isset($viewing_hint) ? $viewing_hint : 'notset';
   $form_state['pid'] = $object->id;
-  return array(
-    'viewing_hint' => array(
+  return [
+    'viewing_hint' => [
       '#type' => 'radios',
       '#title' => t('Page display mode'),
       '#description' => t("This affects how Islandora viewers display page sequences. 'Paged' here is equivalent to the '2-up' mode in IA Book Reader. If left as 'System Default', global option for each viewer will be respected."),
-      '#options' => array(
+      '#options' => [
         'notset' => t('System Default'),
         'paged' => t('Paged'),
         'individual' => t('Individual'),
-      ),
+      ],
       '#default_value' => $viewing_hint,
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#type' => 'submit',
       '#value' => t('Set Page display mode'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -1012,22 +1012,22 @@ function islandora_paged_content_manage_hascover_form(array $form, array &$form_
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $hascover = islandora_paged_content_get_hascover($object);
   $form_state['pid'] = $object->id;
-  return array(
-    'has_cover' => array(
+  return [
+    'has_cover' => [
       '#type' => 'radios',
       '#title' => t('Book Cover?'),
       '#description' => t("This affects how Paged CMODEL Viewers display their first page in a sequence. If set to 'Without Cover', the first page will be displayed on the left side, for a Left-to-Right progression, which means the display will start with a full 2 page spread. Needs to be used in conjuction with a 'Paged' Page display mode or the global '2-up' setting for the IA Book Reader viewer"),
-      '#options' => array(
+      '#options' => [
         'true' => t('Has Cover or First Recto (default)'),
         'false' => t('Without Cover'),
-      ),
+      ],
       '#default_value' => $hascover,
-    ),
-    'submit' => array(
+    ],
+    'submit' => [
       '#type' => 'submit',
       '#value' => t('Set Book Cover Presence'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**

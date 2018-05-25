@@ -12,9 +12,12 @@ This module requires the following modules/libraries:
 * [Tuque](https://github.com/islandora/tuque)
 
 This module has the following optional requirements:
-* [Ghostscript](https://www.ghostscript.com/) - Debian/Ubuntu `sudo apt-get install ghostscript`
-* [pdftotext](http://poppler.freedesktop.org) - Debian/Ubuntu `sudo apt-get install poppler-utils`
-* [pdfinfo](http://poppler.freedesktop.org) -  Debian/Ubuntu `sudo apt-get install poppler-utils`
+* [Ghostscript](https://www.ghostscript.com/) - Debian/Ubuntu `sudo apt-get
+install ghostscript`
+* [pdftotext](http://poppler.freedesktop.org) - Debian/Ubuntu `sudo apt-get
+install poppler-utils`
+* [pdfinfo](http://poppler.freedesktop.org) -  Debian/Ubuntu `sudo apt-get
+install poppler-utils`
 
 ## Installation
 
@@ -30,9 +33,15 @@ pack configuration » Paged Content Module
 
 ![Configuration](https://user-images.githubusercontent.com/2857697/39014759-e2ef9c1e-43e0-11e8-921c-c2a3234d65d2.jpg)
 
-There is an option to set the page label to the page's sequence number. On ingest, each page's label will be set to its sequence number. When reordering pages, all of the page labels will be updated with the new sequence numbers.
+There is an option to set the page label to the page's sequence number. On
+ingest, each page's label will be set to its sequence number. When reordering
+pages, all of the page labels will be updated with the new sequence numbers.
 
-You can also "Hide Page Objects From Search Results", so that only the parent object is returned.  If you use this option, make sure that you check the "Aggregate OCR?" box when ingesting your paged content object. Otherwise, the parent object will not receive an OCR datastream, and will not be returned in search results.
+You can also "Hide Page Objects From Search Results", so that only the parent
+object is returned.  If you use this option, make sure that you check the
+"Aggregate OCR?" box when ingesting your paged content object. Otherwise, the
+parent object will not receive an OCR datastream, and will not be returned in
+search results.
 
 ## Documentation
 

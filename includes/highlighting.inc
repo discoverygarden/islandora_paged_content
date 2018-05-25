@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * This file contains the solr highlighting query.
@@ -16,10 +17,10 @@
  * @return array
  *   An array as per islandora_paged_content_parse_solr_highlighting().
  */
-function islandora_paged_content_perform_solr_highlighting_query($query, $params = array()) {
+function islandora_paged_content_perform_solr_highlighting_query($query, $params = []) {
   $query = trim($query);
   if (empty($query) || !\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
-    return array();
+    return [];
   }
   module_load_include('inc', 'islandora_ocr', 'includes/solr');
   $sequence_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_sequence_number_field');
