@@ -26,7 +26,7 @@ function islandora_paged_content_upload_page_form(array $form, array &$form_stat
   $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
   $extensions = array('tiff tif jp2 jpg jpeg');
   $languages = array();
-  if (module_exists('islandora_ocr')) {
+  if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     module_load_include('inc', 'islandora_ocr', 'includes/utilities');
     $languages = islandora_ocr_get_enabled_tesseract_languages();
   }
@@ -47,9 +47,9 @@ function islandora_paged_content_upload_page_form(array $form, array &$form_stat
     ),
   );
 
-  if (module_exists('islandora_ocr')) {
+  if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     $upload_form['language'] = array(
-      '#access' => module_exists('islandora_ocr'),
+      '#access' => \Drupal::moduleHandler()->moduleExists('islandora_ocr'),
       '#title' => t('Language'),
       '#type' => 'select',
       '#description' => t('Please select the language the page is written in.'),
@@ -81,18 +81,18 @@ function islandora_paged_content_upload_page_form_submit(array $form, array &$fo
 
   $label = $file->filename;
   // Change the label of the page to the sequence number if variable is set.
-  if (variable_get('islandora_paged_content_page_label', FALSE)) {
+  if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_page_label')) {
     $label = $num_pages;
   }
   $object->label = $label;
 
   // Add the OCR creation flags before the datastream is updated.
-  if (module_exists('islandora_ocr')) {
+  if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     module_load_include('inc', 'islandora_ocr', 'includes/derivatives');
     $language = isset($form_state['values']['language']) ? $form_state['values']['language'] : NULL;
     islandora_ocr_set_generating_rels_ext_statements($object, !$form_state['values']['ignore_ocr'], !$form_state['values']['ignore_hocr'], $language);
   }
-  islandora_paged_content_update_datastream($object, drupal_realpath($file->uri), 'OBJ', NULL, NULL, 'M', FALSE);
+  islandora_paged_content_update_datastream($object, \Drupal::service("file_system")->realpath($file->uri), 'OBJ', NULL, NULL, 'M', FALSE);
   // Update RELS-EXT properties, page/sequence/etc, and append the page at the
   // end of the book.
   islandora_paged_content_set_relationship($rels_ext, ISLANDORA_RELS_EXT_URI, 'isPageOf', $parent->id);

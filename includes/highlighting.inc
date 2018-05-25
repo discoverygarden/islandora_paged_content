@@ -18,11 +18,11 @@
  */
 function islandora_paged_content_perform_solr_highlighting_query($query, $params = array()) {
   $query = trim($query);
-  if (empty($query) || !module_exists('islandora_ocr')) {
+  if (empty($query) || !\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     return array();
   }
   module_load_include('inc', 'islandora_ocr', 'includes/solr');
-  $sequence_field = variable_get('islandora_paged_content_sequence_number_field', 'RELS_EXT_isSequenceNumber_literal_ms');
+  $sequence_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_sequence_number_field');
   $params['fl'] = "PID,{$sequence_field}";
   $solr_results = islandora_ocr_highlighted_solr_search($query, 0, -1, $params);
   $results = islandora_ocr_map_highlighted_solr_results_to_bounding_boxes($solr_results);

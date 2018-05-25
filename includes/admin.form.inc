@@ -17,9 +17,14 @@
  *   The Drupal form definition.
  */
 function islandora_paged_content_admin_settings_form(array $form, array &$form_state) {
-  form_load_include($form_state, 'inc', 'islandora_paged_content', 'includes/admin.form');
+  $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/admin.form');
   $get_default_value = function($name, $default) use(&$form_state) {
-    return isset($form_state['values'][$name]) ? $form_state['values'][$name] : variable_get($name, $default);
+    // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// return isset($form_state['values'][$name]) ? $form_state['values'][$name] : variable_get($name, $default);
+
   };
   $gs = $get_default_value('islandora_paged_content_gs', '/usr/bin/gs');
   $pdfinfo = $get_default_value('islandora_paged_content_pdfinfo', '/usr/bin/pdfinfo');
@@ -27,7 +32,7 @@ function islandora_paged_content_admin_settings_form(array $form, array &$form_s
 
   $djatoka_url = $get_default_value('islandora_paged_content_djatoka_url', 'http://localhost:8080/adore-djatoka/');
   $djatoka_availible_message = islandora_paged_content_admin_settings_form_djatoka_availible_message($djatoka_url);
-  $solr_enabled = module_exists('islandora_solr');
+  $solr_enabled = \Drupal::moduleHandler()->moduleExists('islandora_solr');
 
   $form = array(
     'pdf_derivative_settings' => array(
@@ -92,7 +97,7 @@ function islandora_paged_content_admin_settings_form(array $form, array &$form_s
         '#type' => 'checkbox',
         '#title' => t('Allow Extraction of Raw Text'),
         '#description' => t('This will pass the -raw parameter off to pdftotext when extracting text. By default, pdftotext extracts text in natural reading order. In edge case documents, where PDF creation tools have made blocks in errorneous order, text extraction will yield unexpected results. As such, this parameter will pull out text in the order that the PDF creation tool wrote it (layout ignored). This is not a valid default option to have due to that PDF creation tools are not constrained to writing blocks in the order they appear and it is up to the PDF reader to render them correctly.'),
-        '#default_value' => variable_get('islandora_paged_content_pdftotext_use_raw', FALSE),
+        '#default_value' => \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_pdftotext_use_raw'),
       ),
     ),
     'islandora_paged_content_djatoka_url' => array(
@@ -100,7 +105,7 @@ function islandora_paged_content_admin_settings_form(array $form, array &$form_s
       '#prefix' => '<div id="djatoka-path-wrapper">',
       '#suffix' => '</div>',
       '#title' => t('djatoka URL'),
-      '#description' => filter_xss(t('<strong>Externally accessible</strong> URL to the djatoka instance.<br/>!msg', array('!msg' => $djatoka_availible_message))),
+      '#description' => \Drupal\Component\Utility\Xss::filter(t('<strong>Externally accessible</strong> URL to the djatoka instance.<br/>!msg', array('!msg' => $djatoka_availible_message))),
       '#default_value' => $djatoka_url,
       '#ajax' => array(
         'callback' => 'islandora_paged_content_admin_settings_form_djatoka_ajax_callback',

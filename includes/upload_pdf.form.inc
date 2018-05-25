@@ -74,7 +74,7 @@ function islandora_paged_content_upload_pdf_form($form, &$form_state, $model) {
   $states = array();
   $languages = array();
   $default_value = 'none';
-  if (module_exists('islandora_ocr')) {
+  if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     module_load_include('inc', 'islandora_ocr', 'includes/utilities');
     $ocr_options['ocr'] = t('Perform OCR on the PDF.');
     $states[] = array('value' => 'ocr');
@@ -105,7 +105,7 @@ function islandora_paged_content_upload_pdf_form($form, &$form_state, $model) {
     '#default_value' => $default_value,
     '#description' => t("Extracted text is used to aid in the discovery of this object when searching. If the uploaded PDF contains text and not just images of text, we recommend you try to extract it from the PDF. On the other hand if the uploaded PDF is composed of Images of text we and doesn't contain text we recommend you perform OCR."),
   );
-  if (variable_get('islandora_paged_content_pdftotext_use_raw', FALSE)) {
+  if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_pdftotext_use_raw')) {
     $form['text_settings']['rawtext'] = array(
       '#type' => 'radios',
       '#title' => t('Use the raw text of the PDF'),
@@ -184,14 +184,20 @@ function islandora_paged_content_upload_pdf_form_submit($form, $form_state) {
     islandora_paged_content_add_pdf_to_object($object, $file_obj);
     $num_pages = $form_state['number_of_pages'];
     $pages = range(1, $num_pages);
-    $options = array_intersect_key($form_state['values'], drupal_map_assoc(array(
+    $options = array_intersect_key($form_state['values'], array_combine(array(
+      'image_format',
+      'resolution',
+      'language',
+      'extract_text',
+      'model',
+    ), array(
       'image_format',
       'resolution',
       'language',
       'extract_text',
       'model',
     ))) + array('pdf_file' => $file_obj, 'parent' => $object->id);
-    if (variable_get('islandora_paged_content_pdftotext_use_raw', FALSE)) {
+    if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_pdftotext_use_raw')) {
       $options['rawtext'] = $form_state['values']['rawtext'] == 'yes' ? TRUE : FALSE;
     }
     else {

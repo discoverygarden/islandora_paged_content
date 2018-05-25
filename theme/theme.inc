@@ -25,36 +25,54 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
   $next_page = isset($pages[$index + 1]) ? $pages[$index + 1] : NULL;
   $links = array();
   if ($previous_page) {
-    $links[] = array(
-      'title' => t('Prev'),
-      'href' => url("islandora/object/{$previous_page}", array('absolute' => TRUE)),
-    );
+    // @FIXME
+// url() expects a route name or an external URI.
+// $links[] = array(
+//       'title' => t('Prev'),
+//       'href' => url("islandora/object/{$previous_page}", array('absolute' => TRUE)),
+//     );
+
   }
   $links[] = array(
     'title' => '<strong>' . t('Page') . '</strong>',
     'html' => TRUE,
   );
   if ($next_page) {
-    $links[] = array(
-      'title' => t('Next'),
-      'href' => url("islandora/object/{$next_page}", array('absolute' => TRUE)),
-    );
+    // @FIXME
+// url() expects a route name or an external URI.
+// $links[] = array(
+//       'title' => t('Next'),
+//       'href' => url("islandora/object/{$next_page}", array('absolute' => TRUE)),
+//     );
+
   }
   if ($parent) {
-    $links[] = array(
-      'title' => t('All Pages'),
-      'href' => url("islandora/object/{$parent->id}", array('absolute' => TRUE)),
-    );
+    // @FIXME
+// url() expects a route name or an external URI.
+// $links[] = array(
+//       'title' => t('All Pages'),
+//       'href' => url("islandora/object/{$parent->id}", array('absolute' => TRUE)),
+//     );
+
   }
-  return theme('links', array(
-    'links' => $links,
-    'attributes' => array(
-      'class' => array(
-        'links',
-        'inline',
-      ),
-    ),
-  ));
+  // @FIXME
+// theme() has been renamed to _theme() and should NEVER be called directly.
+// Calling _theme() directly can alter the expected output and potentially
+// introduce security issues (see https://www.drupal.org/node/2195739). You
+// should use renderable arrays instead.
+// 
+// 
+// @see https://www.drupal.org/node/2195739
+// return theme('links', array(
+//     'links' => $links,
+//     'attributes' => array(
+//       'class' => array(
+//         'links',
+//         'inline',
+//       ),
+//     ),
+//   ));
+
 }
 
 /**
@@ -62,7 +80,7 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
  */
 function template_preprocess_swaptable(array &$variables) {
   global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
-  element_set_attributes($variables['element'], array('id', 'name'));
+  \Drupal\Core\Render\Element::setAttributes($variables['element'], array('id', 'name'));
   $table = &$variables['element'];
   $variables['pager'] = swaptable_pagers($table['#pager'], count($table['#rows']));
   $variables['table']['left'] = swaptable_table('left', $table, $variables['pager']['left']);
@@ -73,7 +91,15 @@ function template_preprocess_swaptable(array &$variables) {
     'order' => $table['order']['#value'],
     'modified' => $table['modified']['#value'],
   );
-  drupal_add_js($settings, 'setting');
+  // @FIXME
+// The Assets API has totally changed. CSS, JavaScript, and libraries are now
+// attached directly to render arrays using the #attached property.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// @see https://www.drupal.org/node/2408597
+// drupal_add_js($settings, 'setting');
+
 }
 
 /**
@@ -145,7 +171,7 @@ function swaptable_table_rows($position, array $items, array $ordering, array $m
   $rows = array();
   $offset = $pager['page'] * $pager['limit'];
   $ordering = array_slice($ordering, $offset, $pager['limit']);
-  $original_ordering = element_children($items);
+  $original_ordering = \Drupal\Core\Render\Element::children($items);
   foreach ($ordering as $i => $item) {
     $row = $items[$item];
     $data = array();
@@ -157,10 +183,10 @@ function swaptable_table_rows($position, array $items, array $ordering, array $m
       'data' => array_search($item, $original_ordering) + 1,
       'class' => array('original-ordering', 'swaptable-hide'),
     );
-    foreach (element_children($row) as $j) {
+    foreach (\Drupal\Core\Render\Element::children($row) as $j) {
       $cell = $row[$j];
       $data[] = array(
-        'data' => empty($cell['#printed']) ? drupal_render($cell) : $cell['#children'],
+        'data' => empty($cell['#printed']) ? \Drupal::service("renderer")->render($cell) : $cell['#children'],
         'class' => array($j),
       );
     }

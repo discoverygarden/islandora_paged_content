@@ -18,7 +18,14 @@
 function islandora_paged_content_manage_page_menu(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/breadcrumb');
   drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
-  drupal_set_title($object->label);
+  // @FIXME
+// drupal_set_title() has been removed. There are now a few ways to set the title
+// dynamically, depending on the situation.
+// 
+// 
+// @see https://www.drupal.org/node/2067859
+// drupal_set_title($object->label);
+
   $manage_tabs = array(
     'manage_page' => array(
       '#type' => 'vertical_tabs',
@@ -26,7 +33,7 @@ function islandora_paged_content_manage_page_menu(AbstractObject $object) {
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Create a PDF'),
         '#type' => 'fieldset',
-        'form' => drupal_get_form('islandora_paged_content_manage_page_pdf_form', $object),
+        'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_pdf_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       ),
@@ -34,7 +41,7 @@ function islandora_paged_content_manage_page_menu(AbstractObject $object) {
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Perform OCR'),
         '#type' => 'fieldset',
-        'form' => drupal_get_form('islandora_paged_content_manage_page_ocr_form', $object),
+        'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_ocr_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
       ),
@@ -42,7 +49,7 @@ function islandora_paged_content_manage_page_menu(AbstractObject $object) {
         '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
         '#title' => t('Create Images'),
         '#type' => 'fieldset',
-        'form' => drupal_get_form('islandora_paged_content_manage_page_images_form', $object),
+        'form' => \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_images_form', $object),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       ),
@@ -50,14 +57,14 @@ function islandora_paged_content_manage_page_menu(AbstractObject $object) {
         '#access' => isset($object['OCR']) && isset($object['JPG']) && islandora_datastream_access(ISLANDORA_PAGED_CONTENT_EDIT_OCR, $object['OCR']),
         '#title' => t('Edit OCR'),
         '#type' => 'fieldset',
-        'form' => isset($object['OCR']) && isset($object['JPG']) ? drupal_get_form('islandora_paged_content_manage_page_edit_ocr_form', $object) : NULL,
+        'form' => isset($object['OCR']) && isset($object['JPG']) ? \Drupal::formBuilder()->getForm('islandora_paged_content_manage_page_edit_ocr_form', $object) : NULL,
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       ),
     ),
   );
   $context = array('object' => $object);
-  drupal_alter('islandora_paged_content_page_management_tabs', $manage_tabs, $context);
+  \Drupal::moduleHandler()->alter('islandora_paged_content_page_management_tabs', $manage_tabs, $context);
   return $manage_tabs;
 }
 
@@ -78,7 +85,7 @@ function islandora_paged_content_manage_page_ocr_form(array $form, array &$form_
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   module_load_include('inc', 'islandora_ocr', 'includes/utilities');
   $can_derive = islandora_paged_content_can_derive($object, 'OCR');
-  $languages = module_exists('islandora_ocr') ? islandora_ocr_get_enabled_tesseract_languages() : array('eng' => t('English'));
+  $languages = \Drupal::moduleHandler()->moduleExists('islandora_ocr') ? islandora_ocr_get_enabled_tesseract_languages() : array('eng' => t('English'));
   unset($languages['no_ocr']);
   return array(
     'description' => array(
@@ -204,7 +211,7 @@ function islandora_paged_content_manage_page_pdf_form(array $form, array &$form_
       '#type' => 'select',
       '#title' => t('DPI (Dots Per Inch)'),
       '#description' => t('Set the DPI for the generated PDF.'),
-      '#options' => drupal_map_assoc(array('72', '96', '300', '600')),
+      '#options' => array_combine(array('72', '96', '300', '600'), array('72', '96', '300', '600')),
     ),
     'submit' => array(
       '#disabled' => !$can_derive,
@@ -267,19 +274,60 @@ function islandora_paged_content_manage_page_edit_ocr_form(array $form, array &$
       }
     }
   }
-  drupal_add_library('system', 'ui.dialog');
+  // @FIXME
+// The Assets API has totally changed. CSS, JavaScript, and libraries are now
+// attached directly to render arrays using the #attached property.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// @see https://www.drupal.org/node/2408597
+// drupal_add_library('system', 'ui.dialog');
+
   $path = drupal_get_path('module', 'islandora_paged_content');
-  drupal_add_js(array('pid' => $pid, 'width' => $width), 'setting');
-  drupal_add_js("$path/js/islandora_page_ocr_edit.js");
-  drupal_add_css("$path/css/islandora_paged_content.css");
+  // @FIXME
+// The Assets API has totally changed. CSS, JavaScript, and libraries are now
+// attached directly to render arrays using the #attached property.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// @see https://www.drupal.org/node/2408597
+// drupal_add_js(array('pid' => $pid, 'width' => $width), 'setting');
+
+  // @FIXME
+// The Assets API has totally changed. CSS, JavaScript, and libraries are now
+// attached directly to render arrays using the #attached property.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// @see https://www.drupal.org/node/2408597
+// drupal_add_js("$path/js/islandora_page_ocr_edit.js");
+
+  // @FIXME
+// The Assets API has totally changed. CSS, JavaScript, and libraries are now
+// attached directly to render arrays using the #attached property.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// @see https://www.drupal.org/node/2408597
+// drupal_add_css("$path/css/islandora_paged_content.css");
+
 
   $form_state['object'] = $object;
   $form = array();
-  $img = theme('image', array(
-    'path' => "islandora/object/$pid/datastream/JPG/view",
-    'alt' => $object->label,
-    'attributes' => array('id' => 'source_image'),
-  ));
+  // @FIXME
+// theme() has been renamed to _theme() and should NEVER be called directly.
+// Calling _theme() directly can alter the expected output and potentially
+// introduce security issues (see https://www.drupal.org/node/2195739). You
+// should use renderable arrays instead.
+// 
+// 
+// @see https://www.drupal.org/node/2195739
+// $img = theme('image', array(
+//     'path' => "islandora/object/$pid/datastream/JPG/view",
+//     'alt' => $object->label,
+//     'attributes' => array('id' => 'source_image'),
+//   ));
+
   $label = $object->label;
   $prompt = t('Show reference image');
   $form['image'] = array(

@@ -141,7 +141,7 @@ function swaptable_process(array $element, array &$form_state) {
   $get_default_value = function ($name, $default) use ($element) {
     $key_exists = NULL;
     $name = is_array($name) ? $name : array($name);
-    $value = drupal_array_get_nested_value($element['#value'], $name, $key_exists);
+    $value = \Drupal\Component\Utility\NestedArray::getValue($element['#value'], $name, $key_exists);
     return $key_exists ? $value : $default;
   };
   $options = array(10, 25, 50, 100);
@@ -152,7 +152,7 @@ function swaptable_process(array $element, array &$form_state) {
   $element['display'] = array(
     '#type' => 'select',
     '#title' => t('Display'),
-    '#options' => drupal_map_assoc($options),
+    '#options' => array_combine($options, $options),
     '#default_value' => $default,
     '#description' => t('The number of pages to display in each table.'),
     '#ajax' => array(
@@ -182,7 +182,7 @@ function swaptable_process(array $element, array &$form_state) {
   // the automatic shifting that occurs).
   $element['order'] = array(
     '#type' => 'hidden',
-    '#value' => $get_default_value('order', element_children($element['#rows'])),
+    '#value' => $get_default_value('order', \Drupal\Core\Render\Element::children($element['#rows'])),
   );
   $element['modified'] = array(
     '#type' => 'hidden',
@@ -212,7 +212,7 @@ function swaptable_change_number_of_pages_displayed(array $form, array $form_sta
     if (isset($form['#type']) && $form['#type'] == 'swaptable') {
       return $form;
     }
-    foreach (element_children($form) as $child) {
+    foreach (\Drupal\Core\Render\Element::children($form) as $child) {
       $result = $find_swaptable($form[$child]);
       if ($result !== NULL) {
         return $result;
@@ -256,8 +256,8 @@ function islandora_paged_content_islandora_object_ingested(AbstractObject $objec
  * Implements hook_islandora_solr_query().
  */
 function islandora_paged_content_islandora_solr_query($islandora_solr_query) {
-  if (variable_get('islandora_paged_content_hide_pages_solr', FALSE)) {
-    $fq = variable_get('islandora_paged_content_solr_fq', '-RELS_EXT_isPageOf_uri_ms:[* TO *]');
+  if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_hide_pages_solr')) {
+    $fq = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_fq');
     if (!empty($fq)) {
       $islandora_solr_query->solrParams['fq'][] = $fq;
     }

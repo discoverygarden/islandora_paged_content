@@ -97,7 +97,7 @@ function islandora_paged_content_batch_finished($success, $results, $operations)
         $vars = isset($message[1]) ? array_merge($message[1], $place_holders) : $place_holders;
         $status = isset($message[2]) ? $message[2] : 'status';
         $message = format_string($message[0], $vars);
-        drupal_set_message(check_plain($message), $status);
+        drupal_set_message(\Drupal\Component\Utility\Html::escape($message), $status);
       }
     }
   }
@@ -183,7 +183,7 @@ function islandora_paged_content_create_pdf_paged_content_batch_operation($paged
     return;
   }
   islandora_paged_content_start_batch_operation($context['results']['pages'], $context);
-  $pdf_file = drupal_realpath("temporary://{$paged_content->id}_PDF.pdf");
+  $pdf_file = \Drupal::service("file_system")->realpath("temporary://{$paged_content->id}_PDF.pdf");
   // Combined # of pages at a time.
   $files = array_slice($context['results']['pages'], $context['sandbox']['progress'], 10);
   $append = $context['sandbox']['progress'] != 0;
@@ -287,7 +287,7 @@ function islandora_paged_content_create_ocr_paged_content_batch_operation($paged
   if ($context['sandbox']['progress'] == 0) {
     // Opting to write the consolidated OCR to the filesystem to avoid issues
     // with PHP's memory limit on massive books.
-    $context['sandbox']['consolidated_ocr'] = drupal_tempnam("temporary://", "{$paged_content->id}_OCR.txt");
+    $context['sandbox']['consolidated_ocr'] = \Drupal::service("file_system")->tempnam("temporary://", "{$paged_content->id}_OCR.txt");
     $append = TRUE;
   }
   $context['results']['successful'][] = $append ? islandora_paged_content_ocr_append($context['sandbox']['consolidated_ocr'], array($page)) : islandora_paged_content_ocr_combine(array($page), $context['sandbox']['consolidated_ocr']);
@@ -402,7 +402,7 @@ function islandora_paged_content_sequence_pages_batch_operation($paged_content_i
   if ($page) {
     $page = islandora_object_load($page);
     // Change the label of the page to the sequence number if variable is set.
-    if (variable_get('islandora_paged_content_page_label', FALSE)) {
+    if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_page_label')) {
       $page->label = $context['sandbox']['progress'] + 1;
     }
 
@@ -552,7 +552,7 @@ function islandora_paged_content_create_page_from_pdf_batch_operation(array $pag
     // Go construct a new object for our page.
     $object = $tuque->repository->constructObject(islandora_get_namespace($pid));
     islandora_paged_content_add_relationships_to_child($object, $options);
-    if (variable_get('islandora_paged_content_page_label', FALSE)) {
+    if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_page_label')) {
       $object->label = $page;
     }
     else {
@@ -641,7 +641,7 @@ function islandora_paged_content_consolidate_missing_ocr_batch_operation(&$conte
       if (isset($sandbox['objects'][$sandbox['objects_completed']])) {
         $sandbox['current_object'] = $sandbox['objects'][$sandbox['objects_completed']];
         $sandbox['current_pages'] = islandora_paged_content_get_pages(islandora_object_load($sandbox['current_object']));
-        $sandbox['consolidated_ocr'] = drupal_tempnam("temporary://", "{$sandbox['current_object']}_OCR.txt");
+        $sandbox['consolidated_ocr'] = \Drupal::service("file_system")->tempnam("temporary://", "{$sandbox['current_object']}_OCR.txt");
       }
     }
     // Otherwise splice off 10 at most, and append them to the consolidated OCR.
@@ -651,11 +651,7 @@ function islandora_paged_content_consolidate_missing_ocr_batch_operation(&$conte
         file_put_contents($sandbox['consolidated_ocr'], $page_ocr->content, FILE_APPEND);
       }
       else {
-        watchdog('islandora_paged_content',
-          'Failed to load OCR datastream from @page; skipping.',
-          array('@page' => $pid),
-          WATCHDOG_WARNING
-        );
+        \Drupal::logger('islandora_paged_content')->warning('Failed to load OCR datastream from @page; skipping.', array('@page' => $pid));
       }
     }
   }

@@ -11,7 +11,7 @@
  * @see islandora_paged_content_islandora_required_objects()
  */
 function islandora_paged_content_install() {
-  variable_set('islandora_paged_content_gs', '/usr/bin/gs');
+  \Drupal::configFactory()->getEditable('islandora_paged_content.settings')->set('islandora_paged_content_gs', '/usr/bin/gs')->save();
 }
 
 /**
