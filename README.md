@@ -1,4 +1,4 @@
-# Islandora Paged Content [![Build Status](https://travis-ci.org/Islandora/islandora_paged_content.png?branch=7.x)](https://travis-ci.org/Islandora/islandora_paged_content)
+# Islandora Paged Content
 
 ## Introduction
 
