@@ -1,13 +1,13 @@
-<?php
+{#
 
 /**
  * @file
  * Swaptable element template.
  */
-?>
-<div id='<?php print $element['#id']; ?>'>
+#}
+<div id='{{ element.#id }}'>
   <div class="swaptable-display-select">
-    <?php print \Drupal::service("renderer")->render($element['display']); ?>
+    {{ element.display }}
   </div>
   <table class="swaptable-wrapper">
     <tbody>
@@ -33,7 +33,7 @@
 // @see https://www.drupal.org/node/2195739
 // print theme('pager', $pager['left']);
  ?>
-          <?php print \Drupal::service("renderer")->render($element['page']['left']); ?>
+          {{ element.page.left }}
         </td>
         <td valign="top" style="vertical-align: top;">
           <?php // @FIXME
@@ -56,12 +56,12 @@
 // @see https://www.drupal.org/node/2195739
 // print theme('pager', $pager['right']);
  ?>
-          <?php print \Drupal::service("renderer")->render($element['page']['right']); ?>
+          {{ element.page.right }}
         </td>
       </tr>
     </tbody>
   </table>
-  <?php print \Drupal::service("renderer")->render($element['order']); ?>
-  <?php print \Drupal::service("renderer")->render($element['modified']); ?>
-  <?php print \Drupal::service("renderer")->render($element['load']); ?>
+  {{ element.order }}
+  {{ element.modified }}
+  {{ element.load }}
 </div>
