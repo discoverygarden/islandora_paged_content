@@ -1,0 +1,5 @@
+islandora_paged_content.admin:
+  route_name: islandora_paged_content.admin
+  parent: islandora.solution_packs_admin
+  title: 'Paged Content Module'
+  description: 'Configuration for the Paged Content solution pack.'

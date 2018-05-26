@@ -5,6 +5,8 @@
  * Handles the display/submission of the admin settings form for this module.
  */
 
+use Drupal\Core\Url;
+
 /**
  * Gets a message to display if the ocr program provided is accessible or not.
  *
@@ -19,7 +21,10 @@
 function islandora_paged_content_admin_settings_form_executable_available_message($path, $version = NULL, $required_version = NULL) {
   $available = is_executable($path);
   if ($available) {
-    $image = theme_image(['path' => 'misc/watchdog-ok.png', 'attributes' => []]);
+    $image = [
+      '#theme' => 'image',
+      '#uri' => Url::fromUri('base:core/misc/icons/73b355/check.svg')->toString(),
+    ];
     $message = t('Executable found at @path', ['@path' => $path]);
     if ($version) {
       $message .= t('<br/>Version: @version', ['@version' => $version]);
@@ -27,15 +32,21 @@ function islandora_paged_content_admin_settings_form_executable_available_messag
     if ($required_version) {
       $message .= t('<br/>Required Version: @version', ['@version' => $required_version]);
       if (version_compare($version, $required_version) < 0) {
-        $image = theme_image(['path' => 'misc/watchdog-error.png', 'attributes' => []]);
+        $image = [
+          '#theme' => 'image',
+          '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
+        ];
       }
     }
   }
   else {
-    $image = theme_image(['path' => 'misc/watchdog-error.png', 'attributes' => []]);
+    $image = [
+      '#theme' => 'image',
+      '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
+    ];
     $message = t('Unable to locate executable at @path', ['@path' => $path]);
   }
-  return $image . $message;
+  return \Drupal::service('renderer')->render($image) . $message;
 }
 
 /**
@@ -67,14 +78,20 @@ function islandora_paged_content_admin_settings_form_djatoka_availible_message($
   $file_headers = @get_headers($djatoka_url);
   $djatoka_availible = strstr($file_headers[0], '200') !== FALSE;
   if ($djatoka_availible) {
-    $image = theme_image(['path' => 'misc/watchdog-ok.png', 'attributes' => []]);
+    $image = [
+      '#theme' => 'image',
+      '#uri' => Url::fromUri('base:core/misc/icons/73b355/check.svg')->toString(),
+    ];
     $message = t('djatoka url is valid.');
   }
   else {
-    $image = theme_image(['path' => 'misc/watchdog-error.png', 'attributes' => []]);
+    $image = [
+      '#theme' => 'image',
+      '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
+    ];
     $message = t('Unable to locate djatoka installation at @path', ['@path' => $djatoka_url]);
   }
-  return $image . $message;
+  return \Drupal::service('renderer')->render($image) . $message;
 }
 
 /**

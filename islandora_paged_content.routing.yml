@@ -1,0 +1,7 @@
+islandora_paged_content.admin:
+  path: '/admin/config/islandora/solution_pack_config/paged_content'
+  defaults:
+    _title: 'Paged Content Module'
+    _form: '\Drupal\islandora_paged_content\Form\Admin'
+  requirements:
+    _permission: 'administer site configuration'

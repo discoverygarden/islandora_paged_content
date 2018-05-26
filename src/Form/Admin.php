@@ -24,6 +24,20 @@ class Admin extends ModuleHandlerAdminForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('islandora_paged_content.settings');
 
+    $config->set('islandora_paged_content_gs', $form_state->getValue('islandora_paged_content_gs'));
+    $config->set('islandora_paged_content_pdfinfo', $form_state->getValue('islandora_paged_content_pdfinfo'));
+    $config->set('islandora_paged_content_pdftotext', $form_state->getValue('islandora_paged_content_pdftotext'));
+    $config->set('islandora_paged_content_pdftotext_use_raw', $form_state->getValue('islandora_paged_content_pdftotext_use_raw'));
+
+    $config->set('islandora_paged_content_djatoka_url', $form_state->getValue('islandora_paged_content_djatoka_url'));
+    $config->set('islandora_paged_content_sequence_number_field', $form_state->getValue('islandora_paged_content_sequence_number_field'));
+    $config->set('islandora_paged_content_use_solr_for_dimensions', $form_state->getValue('islandora_paged_content_use_solr_for_dimensions'));
+    $config->set('islandora_paged_content_solr_width_field', $form_state->getValue('islandora_paged_content_solr_width_field'));
+    $config->set('islandora_paged_content_solr_height_field', $form_state->getValue('islandora_paged_content_solr_height_field'));
+    $config->set('islandora_paged_content_page_label', $form_state->getValue('islandora_paged_content_page_label'));
+    $config->set('islandora_paged_content_solr_results_alter', $form_state->getValue('islandora_paged_content_solr_results_alter'));
+    $config->set('islandora_paged_content_solr_fq', $form_state->getValue('islandora_paged_content_solr_fq'));
+
     $config->save();
   }
 
@@ -195,6 +209,10 @@ class Admin extends ModuleHandlerAdminForm {
           ],
         ],
       ],
+    ];
+    $form['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Submit'),
     ];
     return $form;
   }

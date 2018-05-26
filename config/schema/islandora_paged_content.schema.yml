@@ -1,0 +1,28 @@
+islandora_paged_content.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    islandora_paged_content_gs:
+      type: string
+    islandora_paged_content_pdfinfo:
+      type: string
+    islandora_paged_content_pdftotext:
+      type: string
+    islandora_paged_content_pdftotext_use_raw:
+      type: boolean
+    islandora_paged_content_djatoka_url:
+      type: string
+    islandora_paged_content_sequence_number_field:
+      type: string
+    islandora_paged_content_use_solr_for_dimensions:
+      type: boolean
+    islandora_paged_content_solr_width_field:
+      type: string
+    islandora_paged_content_solr_height_field:
+      type: string
+    islandora_paged_content_page_label:
+      type: boolean
+    islandora_paged_content_solr_results_alter:
+      type: boolean
+    islandora_paged_content_solr_fq:
+      type: string
