@@ -22,6 +22,8 @@ islandora_paged_content.settings:
       type: string
     islandora_paged_content_page_label:
       type: boolean
+    islandora_paged_content_hide_pages_solr:
+      type: boolean
     islandora_paged_content_solr_results_alter:
       type: boolean
     islandora_paged_content_solr_fq:

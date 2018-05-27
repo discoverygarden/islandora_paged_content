@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Url;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Gets a message to display if the ocr program provided is accessible or not.
@@ -54,13 +55,13 @@ function islandora_paged_content_admin_settings_form_executable_available_messag
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  *
  * @return array
  *   The element to render as part the ajax callback.
  */
-function islandora_paged_content_admin_settings_form_gs_ajax_callback(array $form, array $form_state) {
+function islandora_paged_content_admin_settings_form_gs_ajax_callback(array $form, FormStateInterface $form_state) {
   return $form['pdf_derivative_settings']['islandora_paged_content_gs'];
 }
 
@@ -99,13 +100,13 @@ function islandora_paged_content_admin_settings_form_djatoka_availible_message($
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  *
  * @return array
  *   The element to render as part the ajax callback.
  */
-function islandora_paged_content_admin_settings_form_djatoka_ajax_callback(array $form, array &$form_state) {
+function islandora_paged_content_admin_settings_form_djatoka_ajax_callback(array $form, FormStateInterface $form_state) {
   return $form['islandora_paged_content_djatoka_url'];
 }
 
@@ -114,13 +115,13 @@ function islandora_paged_content_admin_settings_form_djatoka_ajax_callback(array
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  *
  * @return array
  *   The element to render as part the ajax callback.
  */
-function islandora_paged_content_admin_settings_form_pdftotext_ajax_callback(array $form, array $form_state) {
+function islandora_paged_content_admin_settings_form_pdftotext_ajax_callback(array $form, FormStateInterface $form_state) {
   return $form['pdf_paged_content_ingestion_settings']['islandora_paged_content_pdftotext'];
 }
 
@@ -129,12 +130,12 @@ function islandora_paged_content_admin_settings_form_pdftotext_ajax_callback(arr
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  *
  * @return array
  *   The element to render as part the ajax callback.
  */
-function islandora_paged_content_admin_settings_form_pdfinfo_ajax_callback(array $form, array $form_state) {
+function islandora_paged_content_admin_settings_form_pdfinfo_ajax_callback(array $form, FormStateInterface $form_state) {
   return $form['pdf_paged_content_ingestion_settings']['islandora_paged_content_pdfinfo'];
 }

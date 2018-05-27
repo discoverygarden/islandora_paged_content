@@ -35,6 +35,7 @@ class Admin extends ModuleHandlerAdminForm {
     $config->set('islandora_paged_content_solr_width_field', $form_state->getValue('islandora_paged_content_solr_width_field'));
     $config->set('islandora_paged_content_solr_height_field', $form_state->getValue('islandora_paged_content_solr_height_field'));
     $config->set('islandora_paged_content_page_label', $form_state->getValue('islandora_paged_content_page_label'));
+    $config->set('islandora_paged_content_hide_pages_solr', $form_state->getValue('islandora_paged_content_hide_pages_solr'));
     $config->set('islandora_paged_content_solr_results_alter', $form_state->getValue('islandora_paged_content_solr_results_alter'));
     $config->set('islandora_paged_content_solr_fq', $form_state->getValue('islandora_paged_content_solr_fq'));
 
@@ -54,11 +55,8 @@ class Admin extends ModuleHandlerAdminForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/admin.form');
     $get_default_value = function ($name, $default) use ($form_state) {
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// return isset($form_state['values'][$name]) ? $form_state['values'][$name] : variable_get($name, $default);
-
+      $values = $form_state->getValues();
+      return isset($values[$name]) ? $values[$name] : $this->config('islandora_paged_content.settings')->get($name);
     };
     $gs = $get_default_value('islandora_paged_content_gs', '/usr/bin/gs');
     $pdfinfo = $get_default_value('islandora_paged_content_pdfinfo', '/usr/bin/pdfinfo');

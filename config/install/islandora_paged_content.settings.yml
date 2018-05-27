@@ -7,6 +7,7 @@ islandora_paged_content_sequence_number_field: RELS_EXT_isSequenceNumber_literal
 islandora_paged_content_use_solr_for_dimensions: false
 islandora_paged_content_solr_width_field: RELS_INT_width_literal_s
 islandora_paged_content_solr_height_field: RELS_INT_height_literal_s
+islandora_paged_content_hide_pages_solr: false
 islandora_paged_content_page_label: false
 islandora_paged_content_solr_results_alter: false
 islandora_paged_content_solr_fq: -RELS_EXT_isPageOf_uri_ms:[* TO *]
