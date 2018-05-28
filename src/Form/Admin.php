@@ -54,15 +54,15 @@ class Admin extends ModuleHandlerAdminForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/admin.form');
-    $get_default_value = function ($name, $default) use ($form_state) {
+    $get_default_value = function ($name) use ($form_state) {
       $values = $form_state->getValues();
       return isset($values[$name]) ? $values[$name] : $this->config('islandora_paged_content.settings')->get($name);
     };
-    $gs = $get_default_value('islandora_paged_content_gs', '/usr/bin/gs');
-    $pdfinfo = $get_default_value('islandora_paged_content_pdfinfo', '/usr/bin/pdfinfo');
-    $pdftotext = $get_default_value('islandora_paged_content_pdftotext', '/usr/bin/pdftotext');
+    $gs = $get_default_value('islandora_paged_content_gs');
+    $pdfinfo = $get_default_value('islandora_paged_content_pdfinfo');
+    $pdftotext = $get_default_value('islandora_paged_content_pdftotext');
 
-    $djatoka_url = $get_default_value('islandora_paged_content_djatoka_url', 'http://localhost:8080/adore-djatoka/');
+    $djatoka_url = $get_default_value('islandora_paged_content_djatoka_url');
     $djatoka_availible_message = islandora_paged_content_admin_settings_form_djatoka_availible_message($djatoka_url);
     $solr_enabled = $this->moduleHandler->moduleExists('islandora_solr');
 
@@ -145,7 +145,7 @@ class Admin extends ModuleHandlerAdminForm {
         '#type' => 'textfield',
         '#title' => $this->t('Solr page sequence number field'),
         '#description' => $this->t('The page or sequence number of each page or image.'),
-        '#default_value' => $get_default_value('islandora_paged_content_sequence_number_field', 'RELS_EXT_isSequenceNumber_literal_ms'),
+        '#default_value' => $get_default_value('islandora_paged_content_sequence_number_field'),
       ],
       'islandora_paged_content_use_solr_for_dimensions' => [
         '#access' => $solr_enabled,
@@ -157,7 +157,7 @@ class Admin extends ModuleHandlerAdminForm {
         '#access' => $solr_enabled,
         '#type' => 'textfield',
         '#title' => $this->t('Solr width dimension field'),
-        '#default_value' => $get_default_value('islandora_paged_content_solr_width_field', 'RELS_INT_width_literal_s'),
+        '#default_value' => $get_default_value('islandora_paged_content_solr_width_field'),
         '#states' => [
           'visible' => [
             ':input[name="islandora_paged_content_use_solr_for_dimensions"]' => [
@@ -170,7 +170,7 @@ class Admin extends ModuleHandlerAdminForm {
         '#access' => $solr_enabled,
         '#type' => 'textfield',
         '#title' => $this->t('Solr height dimension field'),
-        '#default_value' => $get_default_value('islandora_paged_content_solr_height_field', 'RELS_INT_height_literal_s'),
+        '#default_value' => $get_default_value('islandora_paged_content_solr_height_field'),
         '#states' => [
           'visible' => [
             ':input[name="islandora_paged_content_use_solr_for_dimensions"]' => [
@@ -183,7 +183,7 @@ class Admin extends ModuleHandlerAdminForm {
         '#type' => 'checkbox',
         '#title' => $this->t('Set page labels to sequence numbers'),
         '#description' => $this->t('The sequence number of each page will be used to set its label.'),
-        '#default_value' => $get_default_value('islandora_paged_content_page_label', FALSE),
+        '#default_value' => $get_default_value('islandora_paged_content_page_label'),
       ],
       'islandora_paged_content_solr_results_alter' => [
         '#type' => 'fieldset',
@@ -191,13 +191,13 @@ class Admin extends ModuleHandlerAdminForm {
         'islandora_paged_content_hide_pages_solr' => [
           '#type' => 'checkbox',
           '#title' => $this->t('Hide Page Objects From Search Results'),
-          '#default_value' => $get_default_value('islandora_paged_content_hide_pages_solr', FALSE),
+          '#default_value' => $get_default_value('islandora_paged_content_hide_pages_solr'),
         ],
         'islandora_paged_content_solr_fq' => [
           '#type' => 'textfield',
           '#title' => $this->t('Paged Content Solr Filter Query'),
           '#description' => $this->t('Enter a string representing a query to use to filter pages from Solr results.'),
-          '#default_value' => $get_default_value('islandora_paged_content_solr_fq', '-RELS_EXT_isPageOf_uri_ms:[* TO *]'),
+          '#default_value' => $get_default_value('islandora_paged_content_solr_fq'),
           '#states' => [
             'invisible' => [
               ':input[name="islandora_paged_content_hide_pages_solr"]' => [
