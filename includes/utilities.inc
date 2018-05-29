@@ -11,7 +11,10 @@
  *   Generating OCR and HOCR.
  */
 
-use \Drupal\Component\Serialization\Json;
+use Drupal\Component\Serialization\Json;
+
+use Drupal\islandora_solr\IslandoraSolrQueryProcessor;
+use Drupal\islandora\MimeDetect;
 
 /**
  * Gets all the pages in the given paged content object.
@@ -117,26 +120,17 @@ EOQ;
  */
 function islandora_paged_content_get_pages_solr(AbstractObject $object) {
   $pages = [];
-  $qp = new islandoraSolrQueryProcessor();
-  // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $qp->buildQuery(format_string('!field:("!pid" OR "info:fedora/!pid")', array(
-//     '!field' => variable_get('islandora_solr_member_of_field', 'RELS_EXT_isMemberOf_uri_ms'),
-//     '!pid' => $object->id,
-//   )
-//   ));
+  $qp = new IslandoraSolrQueryProcessor();
+  $qp->buildQuery(strtr('!field:("!pid" OR "info:fedora/!pid")', [
+    '!field' => \Drupal::config('islandora_solr.settings')->get('islandora_solr_member_of_field'),
+    '!pid' => $object->id,
+  ]));
 
   if (\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_hide_pages_solr')) {
     $fq_to_remove = [\Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_fq')];
     $qp->solrParams['fq'] = array_diff($qp->solrParams['fq'], $fq_to_remove);
   }
-  // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $label_field = variable_get('islandora_solr_object_label_field', 'fgs_label_s');
+  $label_field = \Drupal::config('islandora_solr.settings')->get('islandora_solr_object_label_field');
 
   $sequence_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_sequence_number_field');
   $height_field = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_solr_height_field');
@@ -511,9 +505,9 @@ function islandora_paged_content_pdf_combine(array $files, $out) {
     $variables = [
       '@ret' => $ret,
       '@command' => $command,
-      '!output' => implode('<br/>', $output),
+      '@output' => implode('<br/>', $output),
     ];
-    \Drupal::logger('islandora_paged_content')->error('GhostScript failed to combine PDFs.<br/>Error: @ret<br/>Command: @command <br/>Output !output', []);
+    \Drupal::logger('islandora_paged_content')->error('GhostScript failed to combine PDFs.<br/>Error: @ret<br/>Command: @command <br/>Output @output', []);
     return FALSE;
   }
   return TRUE;
@@ -994,7 +988,6 @@ function islandora_paged_content_paged_object_derivatives($context) {
 function islandora_paged_content_page_derivatives($context) {
   $large_image_module_path = drupal_get_path('module', 'islandora_large_image');
   $paged_content_module_path = drupal_get_path('module', 'islandora_paged_content');
-  $ocr_module_path = drupal_get_path('module', 'islandora_ocr');
   $derive = islandora_paged_content_get_enabled_ingest_derivatives($context);
   $derivatives = [];
 
@@ -1008,6 +1001,7 @@ function islandora_paged_content_page_derivatives($context) {
   }
 
   if (isset($derive['ocr']) && $derive['ocr']) {
+    $ocr_module_path = drupal_get_path('module', 'islandora_ocr');
     $derivatives[] = [
       'source_dsid' => 'OBJ',
       'destination_dsid' => 'OCR',
@@ -1235,7 +1229,7 @@ function islandora_paged_content_extract_tiff_from_pdf($uri, $offset, $device, $
   else {
     $base_command = '!gs_path -q -dNOPAUSE -dBATCH -sDEVICE=!device -sCompression=lzw -sOutputFile=!output_file -r!resolution -dFirstPage=!offset -dLastPage=!offset !pdf_uri';
   }
-  $command = format_string($base_command, [
+  $command = strtr($base_command, [
     '!gs_path' => escapeshellarg($gs),
     '!device' => $device,
     '!offset' => $offset,
@@ -1321,18 +1315,18 @@ function islandora_paged_content_add_pdf_to_object(AbstractObject $object, $file
   else {
     $pdf = $object['PDF'];
   }
-  $pdf->setContentFromFile(\Drupal::service("file_system")->realpath($file_obj->uri), FALSE);
-  if ($pdf->label != $file_obj->filename) {
-    $pdf->label = $file_obj->filename;
+  $pdf->setContentFromFile(\Drupal::service("file_system")->realpath($file_obj->getFileUri()), FALSE);
+  if ($pdf->label != $file_obj->getFilename()) {
+    $pdf->label = $file_obj->getFilename();
   }
-  if ($pdf->mimetype != $file_obj->filemime) {
-    $pdf->mimetype = $file_obj->filemime;
+  if ($pdf->mimetype != $file_obj->getMimeType()) {
+    $pdf->mimetype = $file_obj->getMimeType();
   }
   if ($ingest) {
     $object->ingestDatastream($pdf);
   }
   if (!$batch) {
-    islandora_paged_content_track_pdf_ingestion($object->id, $file_obj->fid);
+    islandora_paged_content_track_pdf_ingestion($object->id, $file_obj->id());
   }
 }
 

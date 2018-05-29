@@ -303,7 +303,6 @@ function islandora_paged_content_create_ocr_paged_content_batch_operation($paged
                           '@total' => $context['sandbox']['total']]);
 }
 
-
 /**
  * Gets the batch definition for creating TN, JPG, JP2 datastreams.
  *
@@ -556,9 +555,9 @@ function islandora_paged_content_create_page_from_pdf_batch_operation(array $pag
       $object->label = $page;
     }
     else {
-      $object->label = "$file->filename-$page";
+      $object->label = $file->getFilename() . '-$page';
     }
-    $pdf = islandora_paged_content_chop_pdf($file->uri, $page);
+    $pdf = islandora_paged_content_chop_pdf($file->getFileUri(), $page);
     if ($pdf) {
       $context['results']['successful'][] = islandora_paged_content_update_datastream($object, $pdf, 'PDF', 'PDF', 'application/pdf', 'M');
       $context['results']['files'][] = $pdf;
@@ -566,7 +565,7 @@ function islandora_paged_content_create_page_from_pdf_batch_operation(array $pag
     else {
       $context['messages'][] = t('Unable to chop the PDF for page @page', ['@page' => $page]);
     }
-    $tif = islandora_paged_content_extract_tiff_from_pdf($file->uri, $page, $options['image_format'], $options['resolution']);
+    $tif = islandora_paged_content_extract_tiff_from_pdf($file->getFileUri(), $page, $options['image_format'], $options['resolution']);
     if ($tif) {
       $context['results']['successful'][] = islandora_paged_content_update_datastream($object, $tif, 'OBJ', 'OBJ Datastream', 'image/tiff', 'M', FALSE);
       $context['results']['files'][] = $tif;
@@ -575,7 +574,7 @@ function islandora_paged_content_create_page_from_pdf_batch_operation(array $pag
       $context['messages'][] = t('Unable to extract a TIF for page @page', ['@page' => $page]);
     }
     if ($options['extract_text'] == 'extract') {
-      $full_text = islandora_paged_content_extract_text_from_pdf($file->uri, $page);
+      $full_text = islandora_paged_content_extract_text_from_pdf($file->getFileUri(), $page);
       if ($full_text) {
         $context['results']['successful'][] = islandora_paged_content_update_datastream($object, $full_text, 'OCR', 'OCR', 'text/plain', 'M', FALSE);
         $context['results']['files'][] = $full_text;

@@ -5,6 +5,8 @@
  * Database interaction helpers.
  */
 
+use Drupal\file\Entity\File;
+
 /**
  * Keeps track of a PDF to be deleted down the road.
  *
@@ -32,8 +34,8 @@ function islandora_paged_content_cleanup_source_pdf($pid) {
     ->execute();
   $record = $result->fetchAssoc();
   if (isset($record['fid'])) {
-    $file = file_load($record['fid']);
-    file_delete($file);
+    $pdf_file = File::load($record['fid']);
+    $pdf_file->delete();
     db_delete('islandora_paged_content_pdf_ingest')
       ->condition('pid', $pid)
       ->execute();
