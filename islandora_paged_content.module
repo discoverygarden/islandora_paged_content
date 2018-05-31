@@ -5,6 +5,9 @@
  * Defines management/helper/display functions for page like content.
  */
 
+use Drupal\Core\Render\Element;
+
+// @codingStandardsIgnoreLine
 define('ISLANDORA_PAGED_CONTENT_EDIT_OCR', 'Edit existing OCR stream');
 
 /**
@@ -164,7 +167,7 @@ function swaptable_process(array $element, array &$form_state) {
   // the automatic shifting that occurs).
   $element['order'] = [
     '#type' => 'hidden',
-    '#value' => $get_default_value('order', \Drupal\Core\Render\Element::children($element['#rows'])),
+    '#value' => $get_default_value('order', Element::children($element['#rows'])),
   ];
   $element['modified'] = [
     '#type' => 'hidden',
@@ -194,7 +197,7 @@ function swaptable_change_number_of_pages_displayed(array $form, array $form_sta
     if (isset($form['#type']) && $form['#type'] == 'swaptable') {
       return $form;
     }
-    foreach (\Drupal\Core\Render\Element::children($form) as $child) {
+    foreach (Element::children($form) as $child) {
       $result = $find_swaptable($form[$child]);
       if ($result !== NULL) {
         return $result;

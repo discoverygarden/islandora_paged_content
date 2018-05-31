@@ -645,7 +645,7 @@ function islandora_paged_content_zipped_upload_form(array $form, array &$form_st
     '#title' => t('Compressed images file.'),
     '#type' => 'managed_file',
     '#required' => TRUE,
-    '#description' => t('Select file to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', array('@size' => $upload_size, '@ext' => $extensions[0])),
+    '#description' => t('Select file to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', ['@size' => $upload_size, '@ext' => $extensions[0]]),
     '#default_value' => isset($form_state['values']['files']) ? $form_state['values']['files'] : NULL,
     '#upload_location' => 'temporary://',
     '#upload_validators' => [
@@ -750,9 +750,9 @@ function islandora_paged_content_zipped_upload_form_submit(array $form, array &$
 
   if ($renumber_count) {
     $status_message = \Drupal::translation()->formatPlural(
-        $renumber_count, 'Renumbering 1 page and @adding_message.', 'Renumbering @count pages and @adding_message.', array(
+        $renumber_count, 'Renumbering 1 page and @adding_message.', 'Renumbering @count pages and @adding_message.', [
           '@adding_message' => $status_message,
-        )
+        ]
     );
   }
 
@@ -807,7 +807,7 @@ function islandora_paged_content_zipped_upload_form_submit(array $form, array &$
  * Creates page objects and associates them with object.
  *
  * @param Repository $repository
- *   Active repository object to build NewFedoraObject
+ *   Active repository object to build NewFedoraObject.
  * @param array $config
  *   Associative array of required values.
  * @param string $pages_directory
@@ -860,7 +860,7 @@ function islandora_paged_content_add_pages($repository, $config, $pages_director
  * Alters page and sequence number of page object to allow for inserted pages.
  *
  * @param array $page_to_reindex
- *   Array Containing page pid and current page number
+ *   Array Containing page pid and current page number.
  * @param int $offset
  *   Offset to determine new page number.
  */

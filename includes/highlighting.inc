@@ -17,7 +17,7 @@
  * @return array
  *   An array as per islandora_paged_content_parse_solr_highlighting().
  */
-function islandora_paged_content_perform_solr_highlighting_query($query, $params = []) {
+function islandora_paged_content_perform_solr_highlighting_query($query, array $params = []) {
   $query = trim($query);
   if (empty($query) || !\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
     return [];

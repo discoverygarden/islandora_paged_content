@@ -7,6 +7,8 @@
 
 require_once dirname(__FILE__) . '/../includes/utilities.inc';
 
+use Drupal\Core\Render\Element;
+
 /**
  * Theme the page navigator.
  */
@@ -80,7 +82,7 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
  */
 function template_preprocess_swaptable(array &$variables) {
   global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
-  \Drupal\Core\Render\Element::setAttributes($variables['element'], ['id', 'name']);
+  Element::setAttributes($variables['element'], ['id', 'name']);
   $table = &$variables['element'];
   $variables['pager'] = swaptable_pagers($table['#pager'], count($table['#rows']));
   $variables['table']['left'] = swaptable_table('left', $table, $variables['pager']['left']);
@@ -138,7 +140,7 @@ function swaptable_pagers(array $pager, $total) {
  * @return array
  *   The pager definition for use in the swaptable.
  */
-function swaptable_pager($element, $tags, $quantity, $limit, $total) {
+function swaptable_pager($element, array $tags, $quantity, $limit, $total) {
   $page = pager_default_initialize($total, $limit, $element);
   return [
     'element' => $element,
@@ -171,7 +173,7 @@ function swaptable_table_rows($position, array $items, array $ordering, array $m
   $rows = [];
   $offset = $pager['page'] * $pager['limit'];
   $ordering = array_slice($ordering, $offset, $pager['limit']);
-  $original_ordering = \Drupal\Core\Render\Element::children($items);
+  $original_ordering = Element::children($items);
   foreach ($ordering as $i => $item) {
     $row = $items[$item];
     $data = [];
@@ -183,7 +185,7 @@ function swaptable_table_rows($position, array $items, array $ordering, array $m
       'data' => array_search($item, $original_ordering) + 1,
       'class' => ['original-ordering', 'swaptable-hide'],
     ];
-    foreach (\Drupal\Core\Render\Element::children($row) as $j) {
+    foreach (Element::children($row) as $j) {
       $cell = $row[$j];
       $data[] = [
         'data' => empty($cell['#printed']) ? \Drupal::service("renderer")->render($cell) : $cell['#children'],
