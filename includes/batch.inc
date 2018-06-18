@@ -555,7 +555,7 @@ function islandora_paged_content_create_page_from_pdf_batch_operation(array $pag
       $object->label = $page;
     }
     else {
-      $object->label = $file->getFilename() . '-$page';
+      $object->label = $file->getFilename() . "-$page";
     }
     $pdf = islandora_paged_content_chop_pdf($file->getFileUri(), $page);
     if ($pdf) {
