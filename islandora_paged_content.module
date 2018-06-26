@@ -100,7 +100,7 @@ function islandora_paged_content_manage_pages_access_callback($object, array $co
     ISLANDORA_PURGE,
     ISLANDORA_INGEST,
   ];
-  return islandora_user_access($object, $permissions, $content_models);
+  return islandora_user_access_check($object, $permissions, $content_models);
 }
 
 /**

@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/batch.inc';
  */
 function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/breadcrumb');
-  drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
+  //drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
   // @FIXME
 // drupal_set_title() has been removed. There are now a few ways to set the title
 // dynamically, depending on the situation.
