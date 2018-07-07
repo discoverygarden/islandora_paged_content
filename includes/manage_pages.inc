@@ -2,15 +2,7 @@
 
 /**
  * @file
- * Defines forms for managing objects with child pages.
- *
- * Management Forms:
- *  Create PDF.
- *  Create OCR.
- *  Create Images.
- *  Update Thumbnail.
- *  Reorder Pages.
- *  Delete Pages.
+ * Defines the page holding the forms for managing objects with child pages.
  */
 
 require_once dirname(__FILE__) . '/utilities.inc';
@@ -40,131 +32,64 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
     'pdf' => [
       '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
       '#title' => t('Create PDF'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesPdf', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
     ],
     'ocr' => [
       '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
       '#title' => t('Perform OCR'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesOcr', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
     'images' => [
       '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
       '#title' => t('Create Images'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form_1' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesThumbnail', $object),
       'form_2' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesImages', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
     'page_progression' => [
       '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
       '#title' => t('Page Progression'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePageProgression', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
     'viewinghint' => [
       '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
       '#title' => t('Page display mode'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManageViewingHint', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
     'hascover' => [
       '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
       '#title' => t('Book Cover?'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManageHasCover', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
     'sequence' => [
       '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
       '#title' => t('Reorder Pages'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesSequences', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
     'delete' => [
       '#access' => islandora_object_access(ISLANDORA_PURGE, $object),
       '#title' => t('Delete Pages'),
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => TRUE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesDelete', $object),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
     ],
   ];
   $context = ['object' => $object];
   \Drupal::moduleHandler()->alter('islandora_paged_content_pages_management_tabs', $manage_tabs, $context);
   return $manage_tabs;
-}
-
-/**
- * Creates a PDF of all the child pages.
- *
- * Generates a PDF file for each page and then combines them into a single PDF.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The object to fetch the pages from.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_pages_pdf_form(array $form, array &$form_state, AbstractObject $object) {
-  $form_state['object'] = $object;
-  $can_derive = islandora_paged_content_can_create_pdf() && islandora_paged_content_can_combine_pdf();
-  return [
-    'description' => [
-      '#type' => 'item',
-      '#description' => t('You must have both <b>ImageMagick</b> and <b>GhostScript</b> installed to create/combine PDF files.<br/> This will also update the PDF datastreams for each Page object.'),
-    ],
-    'dpi' => [
-      '#type' => 'select',
-      '#title' => t('DPI - Dots Per Inch'),
-      '#description' => t('Set the DPI for the generated PDF. The higher the resolution the longer the process will take.'),
-      '#options' => array_combine(['72', '96', '300', '600'], ['72', '96', '300', '600']),
-    ],
-    'submit' => [
-      '#disabled' => !$can_derive,
-      '#type' => 'submit',
-      '#value' => t('Create PDF'),
-    ],
-  ];
-}
-
-/**
- * Creates a PDF of the book and a PDF of every page.
- *
- * Triggers a batch to derive a PDF datastreams in each page object.then
- * combined them into a single PDF which is stored in the book object.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- */
-function islandora_paged_content_manage_pages_pdf_form_submit(array $form, array &$form_state) {
-  $object = $form_state['object'];
-  $pages = array_keys(islandora_paged_content_get_pages($object));
-  $options = [
-    '-density' => $form_state['values']['dpi'],
-    '-compress' => 'LZW',
-  ];
-  $batch = islandora_paged_content_create_pdf_batch($object, $pages, $options);
-  batch_set($batch);
 }
 
 /**

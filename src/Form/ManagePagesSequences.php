@@ -32,10 +32,4 @@ class ManagePagesSequences extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-  }
-
 }
