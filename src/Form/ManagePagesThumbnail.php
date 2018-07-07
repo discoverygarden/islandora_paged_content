@@ -5,6 +5,8 @@ namespace Drupal\islandora_paged_content\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+use AbstractObject;
+
 /**
  * {@inheritdoc}
  */
@@ -20,7 +22,7 @@ class ManagePagesThumbnail extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state, AbstractObject $object = NULL) {
     return $form;
   }
 

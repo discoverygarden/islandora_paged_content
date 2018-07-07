@@ -27,7 +27,6 @@ require_once dirname(__FILE__) . '/batch.inc';
  *   book objects.
  */
 function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
-  module_load_include('inc', 'islandora', 'includes/breadcrumb');
   //drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
   // @FIXME
 // drupal_set_title() has been removed. There are now a few ways to set the title
@@ -38,73 +37,70 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
 // drupal_set_title($object->label);
 
   $manage_tabs = [
-    'manage_pages' => [
-      '#type' => 'vertical_tabs',
-      'pdf' => [
-        '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
-        '#title' => t('Create PDF'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesPdf', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-      ],
-      'ocr' => [
-        '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
-        '#title' => t('Perform OCR'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesOcr', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
-      'images' => [
-        '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
-        '#title' => t('Create Images'),
-        '#type' => 'fieldset',
-        'form_1' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesThumbnail', $object),
-        'form_2' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesImages', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
-      'page_progression' => [
-        '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
-        '#title' => t('Page Progression'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePageProgression', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
-      'viewinghint' => [
-        '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
-        '#title' => t('Page display mode'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManageViewingHint', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
-      'hascover' => [
-        '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
-        '#title' => t('Book Cover?'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManageHasCover', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
-      'sequence' => [
-        '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
-        '#title' => t('Reorder Pages'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesSequences', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
-      'delete' => [
-        '#access' => islandora_object_access(ISLANDORA_PURGE, $object),
-        '#title' => t('Delete Pages'),
-        '#type' => 'fieldset',
-        'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesDelete', $object),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      ],
+    'pdf' => [
+      '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
+      '#title' => t('Create PDF'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesPdf', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    ],
+    'ocr' => [
+      '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
+      '#title' => t('Perform OCR'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesOcr', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ],
+    'images' => [
+      '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
+      '#title' => t('Create Images'),
+      '#type' => 'fieldset',
+      'form_1' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesThumbnail', $object),
+      'form_2' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesImages', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ],
+    'page_progression' => [
+      '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
+      '#title' => t('Page Progression'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePageProgression', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ],
+    'viewinghint' => [
+      '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
+      '#title' => t('Page display mode'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManageViewingHint', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ],
+    'hascover' => [
+      '#access' => \Drupal::currentUser()->hasPermission(ISLANDORA_METADATA_EDIT),
+      '#title' => t('Book Cover?'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManageHasCover', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ],
+    'sequence' => [
+      '#access' => islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object['RELS-EXT']),
+      '#title' => t('Reorder Pages'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesSequences', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ],
+    'delete' => [
+      '#access' => islandora_object_access(ISLANDORA_PURGE, $object),
+      '#title' => t('Delete Pages'),
+      '#type' => 'fieldset',
+      'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesDelete', $object),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
     ],
   ];
   $context = ['object' => $object];
