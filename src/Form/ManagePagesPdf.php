@@ -55,7 +55,6 @@ class ManagePagesPdf extends FormBase {
         '#value' => $this->t('Create PDF'),
       ],
     ];
-    return $form;
   }
 
   /**

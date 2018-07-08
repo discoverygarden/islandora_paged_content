@@ -5,9 +5,6 @@
  * Defines the page holding the forms for managing objects with child pages.
  */
 
-require_once dirname(__FILE__) . '/utilities.inc';
-require_once dirname(__FILE__) . '/batch.inc';
-
 /**
  * Displays all the book management forms in a set of vertical tabs.
  *
@@ -90,51 +87,6 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
   $context = ['object' => $object];
   \Drupal::moduleHandler()->alter('islandora_paged_content_pages_management_tabs', $manage_tabs, $context);
   return $manage_tabs;
-}
-
-/**
- * Updates the objects thumbnail from the first child page.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The object to update.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_pages_thumbnail_form(array $form, array &$form_state, AbstractObject $object) {
-  $form_state['object'] = $object;
-  return [
-    'description' => [
-      '#type' => 'item',
-      '#description' => t("Update the thumbnail image. The book must have pages, and the first page must have a TN datastream."),
-    ],
-    'submit' => [
-      '#disabled' => !islandora_paged_content_can_update_paged_content_thumbnail($object),
-      '#type' => 'submit',
-      '#value' => t('Update Thumbnail'),
-    ],
-  ];
-}
-
-/**
- * The submit handler for the update thumbnail form.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- */
-function islandora_paged_content_manage_pages_thumbnail_form_submit(array $form, array &$form_state) {
-  if (islandora_paged_content_update_paged_content_thumbnail($form_state['object'])) {
-    drupal_set_message(t('Thumbnail successfully updated.'), 'status');
-  }
-  else {
-    drupal_set_message(t('Failed to update thumbnail'), 'error');
-  }
 }
 
 /**
