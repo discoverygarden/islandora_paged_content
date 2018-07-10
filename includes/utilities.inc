@@ -312,12 +312,7 @@ function islandora_paged_content_set_relationship($relationships, $predicate_uri
  *   The enabled ingest derivatives.
  */
 function islandora_paged_content_get_enabled_ingest_derivatives($namespace) {
-  $default_derivatives = array_combine(['pdf', 'image', 'ocr'], ['pdf', 'image', 'ocr']);
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// return variable_get("${namespace}_ingest_derivatives", $default_derivatives);
-
+  return \Drupal::config("${namespace}.settings")->get("${namespace}_ingest_derivatives");
 }
 
 /**
