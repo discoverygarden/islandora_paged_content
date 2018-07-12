@@ -12,6 +12,7 @@
  */
 
 use Drupal\Component\Serialization\Json;
+use Drupal\imagemagick\ImagemagickExecArguments;
 
 use Drupal\islandora_solr\IslandoraSolrQueryProcessor;
 use Drupal\islandora\MimeDetect;
@@ -612,18 +613,32 @@ function islandora_paged_content_convert_to_pdf($image_file, array $options) {
     $o = "$k $o";
   };
   array_walk($options, $to_string);
-  $options = implode(' ', $options);
   $pdf_file = "$image_file.pdf";
-  $command_args = "{$options} {$image_file} {$pdf_file}";
-  $output = [];
-  $ret = 0;
-  if (_imagemagick_convert_exec($command_args, $output, $ret) !== TRUE) {
+  $exec_manager = \Drupal::service('imagemagick.exec_manager');
+
+  $args = new ImagemagickExecArguments($exec_manager);
+  $args->setSourceLocalPath($image_file);
+  $args->setDestinationLocalPath($pdf_file);
+  foreach ($options as $option) {
+    $args->addArgument($option);
+  }
+  $command = 'convert';
+  \Drupal::moduleHandler()->alter('imagemagick_arguments', $args, $command);
+  $output = '';
+  $ret = -1;
+  if ($exec_manager->execute($command, $args, $output, $ret) !== TRUE) {
     $variables = [
       '@ret' => $ret,
       '@command' => "convert $command_args",
-      '@output' => implode('<br/>', $output),
+      '@output' => $output,
     ];
-    \Drupal::logger('islandora_paged_content')->error('ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Command: @command<br/>Output: @output', []);
+    \Drupal::logger('islandora_paged_content')->error(
+      'ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Output: @output',
+      [
+      '@ret' => $ret,
+      '@output' => $output,
+      ]
+    );
     return FALSE;
   }
   return $pdf_file;
