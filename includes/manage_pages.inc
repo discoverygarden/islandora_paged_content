@@ -697,55 +697,6 @@ function islandora_paged_content_zipped_upload_ingest_finished($success, $result
 }
 
 /**
- * Sets the page progression for a paged content.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The object to fetch the pages from.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_page_progression_form(array $form, array &$form_state, AbstractObject $object) {
-  module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $page_progression = islandora_paged_content_get_page_progression($object);
-  $form_state['pid'] = $object->id;
-  return [
-    'page_progression' => [
-      '#type' => 'radios',
-      '#title' => t('Page Progression'),
-      '#options' => [
-        'lr' => t('Left-to-Right'),
-        'rl' => t('Right-to-Left'),
-      ],
-      '#default_value' => $page_progression,
-    ],
-    'submit' => [
-      '#type' => 'submit',
-      '#value' => t('Set page progression'),
-    ],
-  ];
-}
-
-/**
- * Submit handler to set page progression for paged content.
- *
- * @param array $form
- *   An array representing a form within Drupal.
- * @param array $form_state
- *   An array containing the Drupal form state.
- */
-function islandora_paged_content_manage_page_progression_form_submit($form, &$form_state) {
-  module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $object = islandora_object_load($form_state['pid']);
-  islandora_paged_content_set_page_progression($object, $form_state['values']['page_progression']);
-  drupal_set_message(t('Page progression updated.'));
-}
-
-/**
  * Form handler for setting the Viewing mode hint for a paged content.
  *
  * @param array $form
