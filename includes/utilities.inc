@@ -949,7 +949,7 @@ function islandora_paged_content_paged_object_derivatives($context) {
   $paged_content_module_path = drupal_get_path('module', 'islandora_paged_content');
   $derivatives = [];
 
-  if ($derive['image']) {
+  if (isset($derive['image']) && $derive['image']) {
     $derivatives[] = [
       'source_dsid' => NULL,
       'destination_dsid' => 'TN',
@@ -957,7 +957,7 @@ function islandora_paged_content_paged_object_derivatives($context) {
       'file' => "$paged_content_module_path/includes/derivatives.inc",
     ];
   }
-  if ($derive['pdf']) {
+  if (isset($derive['pdf']) && $derive['pdf']) {
     $derivatives = array_merge(
       $derivatives,
       [
@@ -970,7 +970,7 @@ function islandora_paged_content_paged_object_derivatives($context) {
       ]
     );
   }
-  if ($derive['ocr']) {
+  if (isset($derive['ocr']) && $derive['ocr']) {
     $derivatives = array_merge(
       $derivatives,
       [
