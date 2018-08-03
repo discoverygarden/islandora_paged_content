@@ -697,59 +697,6 @@ function islandora_paged_content_zipped_upload_ingest_finished($success, $result
 }
 
 /**
- * Form handler for setting the Viewing mode hint for a paged content.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The object to fetch the pages from.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_viewing_hint_form(array $form, array &$form_state, AbstractObject $object) {
-  module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $viewing_hint = islandora_paged_content_get_viewing_hint($object);
-  $viewing_hint = isset($viewing_hint) ? $viewing_hint : 'notset';
-  $form_state['pid'] = $object->id;
-  return [
-    'viewing_hint' => [
-      '#type' => 'radios',
-      '#title' => t('Page display mode'),
-      '#description' => t("This affects how Islandora viewers display page sequences. 'Paged' here is equivalent to the '2-up' mode in IA Book Reader. If left as 'System Default', global option for each viewer will be respected."),
-      '#options' => [
-        'notset' => t('System Default'),
-        'paged' => t('Paged'),
-        'individual' => t('Individual'),
-      ],
-      '#default_value' => $viewing_hint,
-    ],
-    'submit' => [
-      '#type' => 'submit',
-      '#value' => t('Set Page display mode'),
-    ],
-  ];
-}
-
-/**
- * Submit handler for setting the Viewing mode hint for paged content.
- *
- * @param array $form
- *   An array representing a form within Drupal.
- * @param array $form_state
- *   An array containing the Drupal form state.
- */
-function islandora_paged_content_manage_viewing_hint_form_submit($form, &$form_state) {
-  module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $object = islandora_object_load($form_state['pid']);
-  $viewing_hint = $form_state['values']['viewing_hint'] == 'notset' ? NULL : $form_state['values']['viewing_hint'];
-  islandora_paged_content_set_viewing_hint($object, $viewing_hint);
-  drupal_set_message(t('Page display mode updated.'));
-}
-
-/**
  * Form handler for setting the hasCover property flag.
  *
  * @param array $form
