@@ -4,6 +4,8 @@ namespace Drupal\islandora_paged_content\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use AbstractObject;
 
@@ -11,6 +13,24 @@ use AbstractObject;
  * Form for children OCR.
  */
 class ManagePagesOcr extends FormBase {
+
+  protected $moduleHandler;
+
+  /**
+   * Constructor.
+   */
+  public function __construct(ModuleHandlerInterface $module_handler) {
+    $this->moduleHandler = $module_handler;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('module_handler')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -30,7 +50,7 @@ class ManagePagesOcr extends FormBase {
     $can_derive = FALSE;
     $languages = [];
     unset($languages['no_ocr']);
-    if (\Drupal::moduleHandler()->moduleExists('islandora_ocr')) {
+    if ($this->moduleHandler->moduleExists('islandora_ocr')) {
       module_load_include('inc', 'islandora_ocr', 'includes/utilities');
       $can_derive = islandora_ocr_can_derive_ocr();
       $languages = islandora_ocr_get_enabled_tesseract_languages();
