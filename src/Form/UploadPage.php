@@ -98,7 +98,7 @@ class UploadPage extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets RELS-EXT/RELS-INT properties and creates the 'OBJ' datastream.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/utilities');
