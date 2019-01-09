@@ -5,6 +5,8 @@
  * Callbacks used in derivatives hook.
  */
 
+use Drupal\Core\Logger\RfcLogLevel;
+
 /**
  * Generate a PDF derivative.
  */
@@ -45,7 +47,7 @@ function islandora_paged_content_derivatives_pdf(AbstractObject $object, $force 
               '%pid' => $object->id,
             ],
             'type' => 'watchdog',
-            'severity' => WATCHDOG_ERROR,
+            'severity' => RfcLogLevel::ERROR,
           ],
         ],
       ];
@@ -98,7 +100,7 @@ function islandora_paged_content_derive_thumbnail_of_parent(AbstractObject $book
               '@parent' => $book_object->id,
             ],
             'type' => 'watchdog',
-            'severity' => WATCHDOG_ERROR,
+            'severity' => RfcLogLevel::ERROR,
           ],
         ],
       ];
