@@ -90,50 +90,6 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
 }
 
 /**
- * Derives the image datastreams for each page object.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The object to fetch the pages from.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_pages_images_form(array $form, array &$form_state, AbstractObject $object) {
-  $form_state['object'] = $object;
-  $can_derive = islandora_paged_content_can_create_images();
-  return [
-    'description' => [
-      '#type' => 'item',
-      '#description' => t('You must have the <b>Large Image Solution Pack</b> installed to create image derivatives.<br/> This will update the TN, JPG and JP2 datastreams for each page object.'),
-    ],
-    'submit' => [
-      '#disabled' => !$can_derive,
-      '#type' => 'submit',
-      '#value' => t('Create Images'),
-    ],
-  ];
-}
-
-/**
- * Triggers a batch to derive image datastreams in each page object.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- */
-function islandora_paged_content_manage_pages_images_form_submit(array $form, array &$form_state) {
-  $object = $form_state['object'];
-  $pages = array_keys(islandora_paged_content_get_pages($object));
-  $batch = islandora_paged_content_create_images_batch($object, $pages);
-  batch_set($batch);
-}
-
-/**
  * Form for reordering the child pages.
  *
  * @param array $form
