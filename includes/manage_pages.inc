@@ -265,59 +265,6 @@ function islandora_paged_content_manage_pages_sequences_form_submit(array $form,
 }
 
 /**
- * Gets the delete pages form.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The object to fetch the pages from.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_pages_delete_form(array $form, array &$form_state, AbstractObject $object) {
-  $form_state['object'] = $object;
-  $pages = islandora_paged_content_get_pages($object);
-  return [
-    'table' => [
-      '#type' => 'tableselect',
-      '#header' => [
-        'pid' => t('PID'),
-        'page' => t('Sequence Number'),
-        'label' => t('Label'),
-      ],
-      '#options' => $pages,
-      '#multiple' => TRUE,
-    ],
-    'submit' => [
-      '#type' => 'submit',
-      '#value' => t('Delete Selected Pages'),
-    ],
-    'item' => [
-      '#type' => 'item',
-      '#markup' => t('Note: Make sure to re-order pages after deleting pages to keep the numerical index in sequence for search term highlighting.'),
-    ],
-  ];
-}
-
-/**
- * Submit handler for the delete pages form.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- */
-function islandora_paged_content_manage_pages_delete_form_submit(array $form, array &$form_state) {
-  $object = $form_state['object'];
-  $pages = array_values(array_filter($form_state['values']['table']));
-  $batch = islandora_paged_content_delete_pages_batch($object, $pages);
-  batch_set($batch);
-}
-
-/**
  * Local menu action to present a zipped file ingest form.
  *
  * @param AbstractObject $object
