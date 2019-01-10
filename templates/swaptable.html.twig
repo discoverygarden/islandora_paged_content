@@ -5,7 +5,7 @@
  * Swaptable element template.
  */
 #}
-<div id='{{ element.#id }}'>
+<div id='{{ element.id }}'>
   <div class="swaptable-display-select">
     {{ element.display }}
   </div>
@@ -13,49 +13,13 @@
     <tbody>
       <tr>
         <td valign="top" style="vertical-align: top;">
-          <?php // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-//
-//
-// @see https://www.drupal.org/node/2195739
-// print theme('table', $table['left']);
- ?>
-          <?php // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-//
-//
-// @see https://www.drupal.org/node/2195739
-// print theme('pager', $pager['left']);
- ?>
+          {{ table.left }}
+          {{ pager.left }}
           {{ element.page.left }}
         </td>
         <td valign="top" style="vertical-align: top;">
-          <?php // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-//
-//
-// @see https://www.drupal.org/node/2195739
-// print theme('table', $table['right']);
- ?>
-          <?php // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-//
-//
-// @see https://www.drupal.org/node/2195739
-// print theme('pager', $pager['right']);
- ?>
+          {{ table.right }}
+          {{ pager.right }}
           {{ element.page.right }}
         </td>
       </tr>

@@ -88,19 +88,11 @@ function template_preprocess_swaptable(array &$variables) {
   $variables['table']['left'] = swaptable_table('left', $table, $variables['pager']['left']);
   $variables['table']['right'] = swaptable_table('right', $table, $variables['pager']['right']);
   $base = $table['#id'];
-  $settings['swapTable'][$base] = [
+  $variables['#attached']['drupalSettings']['swapTable'][$base] = [
     'name' => $table['#name'],
     'order' => $table['order']['#value'],
     'modified' => $table['modified']['#value'],
   ];
-  // @FIXME
-// The Assets API has totally changed. CSS, JavaScript, and libraries are now
-// attached directly to render arrays using the #attached property.
-//
-//
-// @see https://www.drupal.org/node/2169605
-// @see https://www.drupal.org/node/2408597
-// drupal_add_js($settings, 'setting');
 
 }
 
@@ -143,11 +135,12 @@ function swaptable_pagers(array $pager, $total) {
 function swaptable_pager($element, array $tags, $quantity, $limit, $total) {
   $page = pager_default_initialize($total, $limit, $element);
   return [
-    'element' => $element,
-    'tags' => $tags,
-    'quantity' => $quantity,
-    'limit' => $limit,
-    'page' => $page,
+    '#theme' => 'pager',
+    '#element' => $element,
+    '#tags' => $tags,
+    '#quantity' => $quantity,
+    '#limit' => $limit,
+    '#page' => $page,
   ];
 }
 
@@ -229,8 +222,9 @@ function swaptable_table($position, array $table, array $pager) {
     ],
   ];
   return [
-    'header' => array_merge($header, $table['#header']),
-    'rows' => swaptable_table_rows($position, $table['#rows'], $table['order']['#value'], $table['modified']['#value'], $pager),
-    'attributes' => $table['#attributes'],
+    '#theme' => 'table',
+    '#header' => array_merge($header, $table['#header']),
+    '#rows' => swaptable_table_rows($position, $table['#rows'], $table['order']['#value'], $table['modified']['#value'], $pager),
+    '#attributes' => $table['#attributes'],
   ];
 }

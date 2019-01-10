@@ -11,6 +11,8 @@ islandora-paged-content-swaptable:
     - core/jquery.ui.droppable
     - core/jquery.ui.sortable
     - core/jquery.ui.selectable
+    - core/drupalSettings
+    - core/drupal
 islandora-paged-content-css:
   version: 1.x
   css:
