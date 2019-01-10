@@ -5,6 +5,8 @@
  * Defines the page holding the forms for managing objects with child pages.
  */
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Displays all the book management forms in a set of vertical tabs.
  *
@@ -90,123 +92,36 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
 }
 
 /**
- * Form for reordering the child pages.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- * @param AbstractObject $object
- *   The book object to fetch the pages from.
- *
- * @return array
- *   The Drupal form.
- */
-function islandora_paged_content_manage_pages_sequences_form(array $form, array &$form_state, AbstractObject $object) {
-  $form_state['pid'] = $object->id;
-  // Cache the generated rows, as this build function gets called for every
-  // ajax callback.
-  if (!isset($form_state['rows'])) {
-    $pages = islandora_paged_content_get_pages($object);
-    $rows = [];
-    foreach ($pages as $page) {
-      $id = $page['pid'];
-      $url = "islandora/object/{$id}";
-      // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-//
-//
-// @see https://www.drupal.org/node/2195739
-// $rows[$id] = array(
-//         'tn' => array(
-//           '#markup' => theme(
-//               'image', array(
-//                 'path' => url("$url/datastream/TN/view"),
-//                 'attributes' => array(
-//                   'width' => '64px',
-//                   'height' => '64px',
-//                 )))),
-//         'label' => array(
-//           '#markup' => l($page['label'], $url, array(
-//             'html' => TRUE,
-//             'attributes' => array('title' => $page['label'])))),
-//       );
-
-    }
-    $form_state['rows'] = $rows;
-  }
-  return [
-    'table' => [
-      '#type' => 'swaptable',
-      '#header' => [
-        t('Thumbnail'),
-        t('Label'),
-      ],
-      '#rows' => $form_state['rows'],
-    ],
-    'quick_reorder' => [
-      '#type' => 'fieldset',
-      '#title' => t('Quick Reorder'),
-      'pages_to_move' => [
-        '#type' => 'textfield',
-        '#title' => t('Move Pages:'),
-        '#description' => t("Must follow the form '1, 2-4,5'."),
-      ],
-      'pages_insert_point' => [
-        '#type' => 'textfield',
-        '#title' => t('Insert After:'),
-      ],
-      'submit' => [
-        '#validate' => ['islandora_paged_content_quick_reorder_validate'],
-        '#type' => 'submit',
-        '#submit' => ['islandora_paged_content_quick_reorder_submit'],
-        '#value' => t('Go'),
-      ],
-    ],
-    'actions' => [
-      '#type' => 'actions',
-      'submit' => [
-        '#type' => 'submit',
-        '#value' => t('Save Changes'),
-      ],
-    ],
-  ];
-}
-
-/**
  * Validates quick_reorder fieldset.
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  */
-function islandora_paged_content_quick_reorder_validate($form, &$form_state) {
+function islandora_paged_content_quick_reorder_validate($form, FormStateInterface $form_state) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
 
-  $pages = islandora_paged_content_get_pages(islandora_object_load($form_state['pid']));
+  $pages = islandora_paged_content_get_pages(islandora_object_load($form_state->getStorage()['pid']));
   $first_page = array_shift($pages);
   $last_page = array_pop($pages);
   $page_numbers = range($first_page['page'], $last_page['page']);
 
   // Insert point validation.
-  if (!preg_match('/^[0-9\s]/', $form_state['values']['pages_insert_point']) ||
-      !in_array($form_state['values']['pages_insert_point'], $page_numbers)) {
-    form_set_error('pages_insert_point', t('Insert point must be a valid page number.'));
+  if (!preg_match('/^[0-9\s]/', $form_state->getValue('pages_insert_point')) ||
+      !in_array($form_state->getValue('pages_insert_point'), $page_numbers)) {
+    $form_state->setError('pages_insert_point', t('Insert point must be a valid page number.'));
   }
 
   // Pages to move validation.
-  if (!preg_match('/^[0-9\s,\-]/', $form_state['values']['pages_to_move'])) {
-    form_set_error(
+  if (!preg_match('/^[0-9\s,\-]/', $form_state->getValue('pages_to_move'))) {
+    $form_state->setError(
         'pages_to_move', t("Pages to move must follow the form '1, 2-4,5'.")
     );
   }
-  $pages_to_move_list = islandora_paged_content_parse_pages_to_move($form_state['values']['pages_to_move']);
+  $pages_to_move_list = islandora_paged_content_parse_pages_to_move($form_state->getValue('pages_to_move'));
   if ($pages_to_move_list != array_intersect($pages_to_move_list, $page_numbers)) {
-    form_set_error('pages_to_move', t('All pages must be in range.'));
+    $form_state->setError('pages_to_move', t('All pages must be in range.'));
   }
 }
 
@@ -215,15 +130,15 @@ function islandora_paged_content_quick_reorder_validate($form, &$form_state) {
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  */
-function islandora_paged_content_quick_reorder_submit($form, &$form_state) {
+function islandora_paged_content_quick_reorder_submit($form, FormStateInterface $form_state) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $page_numbers_to_move = islandora_paged_content_parse_pages_to_move($form_state['values']['pages_to_move']);
+  $page_numbers_to_move = islandora_paged_content_parse_pages_to_move($form_state->getValue('pages_to_move'));
 
   // Build page array without changed pids.
-  $book = islandora_object_load($form_state['pid']);
+  $book = islandora_object_load($form_state->getStorage()['pid']);
   $raw_pages = islandora_paged_content_get_pages($book);
   $pages = [];
   $page_pids_to_move = [];
@@ -239,29 +154,12 @@ function islandora_paged_content_quick_reorder_submit($form, &$form_state) {
   // Add in changed PIDs. Fixes sequence numbers.
   array_splice(
       $pages, array_search(
-          $form_state['values']['pages_insert_point'], array_keys($pages)
+          $form_state->getValue('pages_insert_point'), array_keys($pages)
       ) + 1, 0, $page_pids_to_move
   );
 
   $batch = islandora_paged_content_sequence_pages_batch($book, $pages);
   batch_set($batch);
-}
-
-/**
- * Submit handler for the sequence form.
- *
- * @param array $form
- *   The Drupal form.
- * @param array $form_state
- *   The Drupal form state.
- */
-function islandora_paged_content_manage_pages_sequences_form_submit(array $form, array &$form_state) {
-  $object = islandora_object_load($form_state['pid']);
-  $pages = $form_state['values']['table']['order'];
-  if ($pages) {
-    $batch = islandora_paged_content_sequence_pages_batch($object, $pages);
-    batch_set($batch);
-  }
 }
 
 /**
