@@ -20,13 +20,13 @@ class ManagePagesPdf extends FormBase {
   }
 
   /**
-   * Generates a PDF file for each page and then combines them into a single PDF.
+   * Generate a PDF file for each page and then combine them into a single PDF.
    *
    * @param array $form
    *   The Drupal form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The Drupal form state.
-   * @param AbstractObject $object
+   * @param \AbstractObject $object
    *   The object to fetch the pages from.
    *
    * @return array
@@ -47,7 +47,10 @@ class ManagePagesPdf extends FormBase {
         '#type' => 'select',
         '#title' => $this->t('DPI - Dots Per Inch'),
         '#description' => $this->t('Set the DPI for the generated PDF. The higher the resolution the longer the process will take.'),
-        '#options' => array_combine(['72', '96', '300', '600'], ['72', '96', '300', '600']),
+        '#options' => array_combine(
+          ['72', '96', '300', '600'],
+          ['72', '96', '300', '600']
+        ),
       ],
       'submit' => [
         '#disabled' => !$can_derive,
