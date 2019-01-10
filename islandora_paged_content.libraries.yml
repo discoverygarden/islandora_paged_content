@@ -1,0 +1,23 @@
+islandora-paged-content-swaptable:
+  version: 1.x
+  js:
+    js/swaptable.js: {}
+  css:
+    layout:
+      css/islandora_paged_content.swaptable.css: {}
+  dependencies:
+    - core/jquery.cookie
+    - core/jquery.ui.draggable
+    - core/jquery.ui.droppable
+    - core/jquery.ui.sortable
+    - core/jquery.ui.selectable
+islandora-paged-content-css:
+  version: 1.x
+  css:
+    layout:
+      css/islandora_paged_content.css: {}
+islandora-paged-content-ocr:
+  version: 1.x
+  css:
+    layout:
+      css/islandora_page_ocr_edit.css: {}
