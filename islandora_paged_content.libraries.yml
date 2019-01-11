@@ -1,4 +1,4 @@
-islandora-paged-content-swaptable:
+swaptable:
   version: 1.x
   js:
     js/swaptable.js: {}
@@ -18,7 +18,7 @@ islandora-paged-content-css:
   css:
     layout:
       css/islandora_paged_content.css: {}
-islandora-paged-content-ocr:
+edit-ocr:
   version: 1.x
   css:
     layout:

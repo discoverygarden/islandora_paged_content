@@ -40,7 +40,7 @@ class Swaptable extends FormElement {
       '#theme_wrappers' => ['form_element'],
       '#attached' => [
         'library' => [
-          'islandora-paged-content-swaptable',
+          'islandora_paged_content/swaptable',
         ],
       ],
     ];

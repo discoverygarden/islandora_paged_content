@@ -109,6 +109,7 @@ function template_preprocess_swaptable(array &$variables) {
  */
 function swaptable_pagers(array $pager, $total) {
   extract($pager);
+
   return [
     'left' => swaptable_pager($element['left'], $tags, $quantity, $limit, $total),
     'right' => swaptable_pager($element['right'], $tags, $quantity, $limit, $total),
@@ -139,6 +140,9 @@ function swaptable_pager($element, array $tags, $quantity, $limit, $total) {
     '#element' => $element,
     '#tags' => $tags,
     '#quantity' => $quantity,
+    '#parameters' => [],
+    '#route_name' => \Drupal::routeMatch()->getRouteName(),
+    '#route_parameters' => \Drupal::routeMatch()->getRawParameters()->all(),
     '#limit' => $limit,
     '#page' => $page,
   ];
@@ -164,8 +168,8 @@ function swaptable_pager($element, array $tags, $quantity, $limit, $total) {
  */
 function swaptable_table_rows($position, array $items, array $ordering, array $modified, array $pager) {
   $rows = [];
-  $offset = $pager['page'] * $pager['limit'];
-  $ordering = array_slice($ordering, $offset, $pager['limit']);
+  $offset = $pager['#page'] * $pager['#limit'];
+  $ordering = array_slice($ordering, $offset, $pager['#limit']);
   $original_ordering = Element::children($items);
   foreach ($ordering as $i => $item) {
     $row = $items[$item];
