@@ -3,7 +3,7 @@
  * JS to enable the swaptable.
  */
 
-(function ($) {
+(function ($, Drupal) {
   "use strict";
 
   /**
@@ -37,7 +37,7 @@
         };
       for (base in settings.swapTable) {
         if (settings.swapTable.hasOwnProperty(base)) {
-          $('#' + base, context).once('swaptable', constructSwapTable);
+          $('#' + base, context).once('swaptable').each(constructSwapTable);
         }
       }
     }
@@ -53,7 +53,6 @@
    */
   Drupal.swapTable = function (table, settings) {
     var self = this, name = settings.name;
-
     // Required object variables.
     this.table = table;
     this.form = $(table).parents('form');
@@ -91,7 +90,7 @@
     // make sure we update the hidden value with the latest ordering and
     // modifications.
     $('.ajax-processed', this.form).each(function () {
-      Drupal.ajax[this.id].beforeSerialize = function (element, options) {
+      drupalSettings.ajax[this.id].beforeSerialize = function (element, options) {
         self.serializeOrderAndModifications();
         Drupal.ajax.prototype.beforeSerialize.call(this, element, options);
       };
@@ -163,7 +162,7 @@
       containment: this.table,
       opacity: 0.7,
       helper: function (event) {
-        var selected = $(event.currentTarget).siblings('.ui-selected').andSelf().addClass('ui-selected'),
+        var selected = $(event.currentTarget).siblings('.ui-selected').addBack().addClass('ui-selected'),
           content = $(selected[0]).clone(false).removeAttr('id').removeClass('ui-droppable'),
           helper = $('<div class="ui-helper" style="position: absolute;"/>');
         $('.ordering', content).hide();
@@ -191,7 +190,7 @@
       start: function (event, ui) {
         var table = $(this).parents('table')[0],
           otherTable = (table === self.left) ? self.right : self.left,
-          selected = $(this).siblings('.ui-selected').andSelf();
+          selected = $(this).siblings('.ui-selected').addBack();
         // Cancel selections in other table now that dragging has begun.
         $('tr.ui-selected', otherTable).removeClass('ui-selected');
         self.selectElements(this, selected);
@@ -242,8 +241,8 @@
   Drupal.swapTable.prototype.reload = function (pages) {
     var id = $(this.load).attr('id');
     pages = pages || this.page.left + ',' + this.page.right;
-    Drupal.ajax[id].options.url += '?page=' + pages;
-    $(this.load).trigger('mousedown');
+    drupalSettings.ajax[id].url += '?page=' + pages;
+    $(this.load).mousedown();
   };
 
   /**
@@ -427,7 +426,7 @@
     // Set a cookie if it is not already present.
     if ($.cookie('Drupal.swapTable.showOriginal') === null) {
       $.cookie('Drupal.swapTable.showOriginal', 0, {
-        path: Drupal.settings.basePath,
+        path: drupalSettings.basePath,
         // The cookie expires in one year.
         expires: 365
       });
@@ -456,7 +455,7 @@
     $('.swaptable-toggle-original-ordering').text(Drupal.t('Show original order'));
     // Change cookie.
     $.cookie('Drupal.swapTable.showOriginal', 0, {
-      path: Drupal.settings.basePath,
+      path: drupalSettings.basePath,
       // The cookie expires in one year.
       expires: 365
     });
@@ -474,9 +473,9 @@
     $('.swaptable-toggle-original-ordering').text(Drupal.t('Hide original order'));
     // Change cookie.
     $.cookie('Drupal.swapTable.showOriginal', 1, {
-      path: Drupal.settings.basePath,
+      path: drupalSettings.basePath,
       // The cookie expires in one year.
       expires: 365
     });
   };
-}(jQuery));
+}(jQuery, Drupal));

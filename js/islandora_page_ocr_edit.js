@@ -3,7 +3,7 @@
  * JS for preview.
  */
 
-(function ($) {
+(function ($, Drupal) {
   Drupal.behaviors.islandora_paged_content = {
     attach: function (context, settings) {
       $("a.preview").click(function () {
@@ -11,4 +11,4 @@
       });
     }
   };
-})(jQuery);
+})(jQuery, Drupal);
