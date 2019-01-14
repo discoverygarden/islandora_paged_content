@@ -34,6 +34,9 @@ tbody > tr.ui-selected,
 .swaptable-display-select {
   text-align: right;
 }
+.swaptable-display-select label {
+  display: block;
+}
 tr.ui-modified > td.tn:after {
   content: url(../images/modified.png);
   vertical-align: 240%;
