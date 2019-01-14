@@ -63,9 +63,9 @@ class ManagePagesSequences extends FormBase {
         $id = $page['pid'];
         $img = [
           '#theme' => 'image',
-          '#uri' => islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object['TN'] ?
+          '#uri' => islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object['TN']) ?
             Url::fromRoute('islandora.view_datastream_view', ['object' => $id, 'datastream' => 'TN'])->toString() :
-            "$islandora_path/images/folder.png"),
+            "$islandora_path/images/folder.png",
           '#attributes' => [
             'width' => '64px',
             'height' => '64px',
