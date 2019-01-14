@@ -120,18 +120,18 @@
     // Add a link before the table for users to show or hide weight columns.
     $('<a href="#" class="swaptable-toggle-original-ordering"></a>')
       .attr('title', Drupal.t('Show the original order of items.'))
-      .click(function () {
-        if ($.cookie('Drupal.swapTable.showOriginal') === 1) {
+      .wrap('<div class="swaptable-toggle-original-ordering-wrapper"></div>')
+      .parent()
+      .insertBefore(this.table);
+    $('.swaptable-toggle-original-ordering').click(function () {
+        if ($.cookie('Drupal.swapTable.showOriginal') == 1) {
           self.hideColumns();
         }
         else {
           self.showColumns();
         }
         return false;
-      })
-      .wrap('<div class="swaptable-toggle-original-ordering-wrapper"></div>')
-      .parent()
-      .insertBefore(this.table);
+      });
 
     // Initialize the specified columns.
     self.initColumns();
@@ -450,7 +450,7 @@
    */
   Drupal.swapTable.prototype.hideColumns = function () {
     // Hide weight/parent cells and headers.
-    $('.swaptable-hide', '.swaptable-processed').hide();
+    $('.swaptable-hide').hide();
     // Change link text.
     $('.swaptable-toggle-original-ordering').text(Drupal.t('Show original order'));
     // Change cookie.
@@ -468,7 +468,7 @@
    */
   Drupal.swapTable.prototype.showColumns = function () {
     // Show weight/parent cells and headers.
-    $('.swaptable-hide', '.swaptable-processed').show();
+    $('.swaptable-hide').show();
     // Change link text.
     $('.swaptable-toggle-original-ordering').text(Drupal.t('Hide original order'));
     // Change cookie.

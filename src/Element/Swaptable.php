@@ -48,7 +48,6 @@ class Swaptable extends FormElement {
     return $info;
   }
 
-
   /**
    * Value callback for swaptable element.
    */
@@ -61,4 +60,5 @@ class Swaptable extends FormElement {
     }
     return [];
   }
+
 }
