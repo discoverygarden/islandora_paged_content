@@ -122,7 +122,7 @@ class UploadPage extends FormBase {
       $language = isset($form_state->getValues()['language']) ? $form_state->getValue('language') : NULL;
       islandora_ocr_set_generating_rels_ext_statements($object, !$form_state->getValue('ignore_ocr'), !$form_state->getValue('ignore_hocr'), $language);
     }
-    islandora_paged_content_update_datastream($object, drupal_realpath($file->getUri()), 'OBJ', NULL, NULL, 'M', FALSE);
+    islandora_paged_content_update_datastream($object, $file->getFileUri(), 'OBJ', NULL, NULL, 'M', FALSE);
     // Update RELS-EXT properties, page/sequence/etc, and append the page at the
     // end of the book.
     islandora_paged_content_set_relationship($rels_ext, ISLANDORA_RELS_EXT_URI, 'isPageOf', $parent->id);
