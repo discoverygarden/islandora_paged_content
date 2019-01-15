@@ -86,16 +86,6 @@
       self.reload($.data(this, 'pages'));
     });
 
-    // Before any ajax elements within this form serialize the form values
-    // make sure we update the hidden value with the latest ordering and
-    // modifications.
-    $('.ajax-processed', this.form).each(function () {
-      drupalSettings.ajax[this.id].beforeSerialize = function (element, options) {
-        self.serializeOrderAndModifications();
-        Drupal.ajax.prototype.beforeSerialize.call(this, element, options);
-      };
-    });
-
     // Always ensure the hidden fields has the latest ordering/modifications
     // before submitting.
     this.form.submit(function () {
@@ -239,6 +229,7 @@
    * Triggers and hidden submit button that uses ajax to rebuild the page.
    */
   Drupal.swapTable.prototype.reload = function (pages) {
+    this.serializeOrderAndModifications();
     var id = $(this.load).attr('id');
     pages = pages || this.page.left + ',' + this.page.right;
     drupalSettings.ajax[id].url += '?page=' + pages;
