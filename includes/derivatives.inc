@@ -25,10 +25,10 @@ function islandora_paged_content_derivatives_pdf(AbstractObject $object, $force 
         'success' => TRUE,
         'messages' => [
           [
-            'message' => t('Generated %dsid on %pid.'),
+            'message' => t('Generated @dsid on @pid.'),
             'message_sub' => [
-              '%dsid' => 'PDF',
-              '%pid' => $object->id,
+              '@dsid' => 'PDF',
+              '@pid' => $object->id,
             ],
             'type' => 'dsm',
             'severity' => 'status',
@@ -41,10 +41,10 @@ function islandora_paged_content_derivatives_pdf(AbstractObject $object, $force 
         'success' => FALSE,
         'messages' => [
           [
-            'message' => t('Failed to generated %dsid on %pid.'),
+            'message' => t('Failed to generated @dsid on @pid.'),
             'message_sub' => [
-              '%dsid' => 'PDF',
-              '%pid' => $object->id,
+              '@dsid' => 'PDF',
+              '@pid' => $object->id,
             ],
             'type' => 'watchdog',
             'severity' => RfcLogLevel::ERROR,
