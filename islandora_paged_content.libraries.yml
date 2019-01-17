@@ -13,13 +13,12 @@ swaptable:
     - core/jquery.ui.selectable
     - core/drupalSettings
     - core/drupal
-islandora-paged-content-css:
+edit-ocr:
   version: 1.x
+  js:
+    js/islandora_page_ocr_edit.js: {}
   css:
     layout:
       css/islandora_paged_content.css: {}
-edit-ocr:
-  version: 1.x
-  css:
-    layout:
-      css/islandora_page_ocr_edit.css: {}
+  dependencies:
+    - core/jquery.ui.dialog
