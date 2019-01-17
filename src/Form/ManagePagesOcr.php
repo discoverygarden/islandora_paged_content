@@ -49,12 +49,12 @@ class ManagePagesOcr extends FormBase {
     $form_state->setStorage(['object' => $object]);
     $can_derive = FALSE;
     $languages = [];
-    unset($languages['no_ocr']);
     if ($this->moduleHandler->moduleExists('islandora_ocr')) {
       module_load_include('inc', 'islandora_ocr', 'includes/utilities');
       $can_derive = islandora_ocr_can_derive_ocr();
       $languages = islandora_ocr_get_enabled_tesseract_languages();
     }
+    unset($languages['no_ocr']);
     return [
       'description' => [
         '#type' => 'item',

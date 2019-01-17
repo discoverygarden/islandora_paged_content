@@ -44,11 +44,15 @@ class ManagePageOcr extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, AbstractObject $object = NULL) {
     $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/utilities');
-    $form_state->loadInclude('islandora_ocr', 'inc', 'includes/utilities');
 
     $form_state->setStorage(['object' => $object->id]);
-    $can_derive = islandora_paged_content_can_derive($object, 'OCR');
-    $languages = $this->moduleHandler->moduleExists('islandora_ocr') ? islandora_ocr_get_enabled_tesseract_languages() : ['eng' => $this->t('English')];
+    $can_derive = FALSE;
+    $languages = ['eng' => $this->t('English')];
+    if ($this->moduleHandler->moduleExists('islandora_ocr')) {
+      module_load_include('inc', 'islandora_ocr', 'includes/utilities');
+      $can_derive = islandora_ocr_can_derive_ocr();
+      $languages = islandora_ocr_get_enabled_tesseract_languages();
+    }
     unset($languages['no_ocr']);
     return [
       'description' => [

@@ -65,7 +65,7 @@ class ManagePagePdf extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $object = islandora_object_load($form_state->getStorage()['object']);
     $options = [
-      '-density' => $form_state['values']['dpi'],
+      '-density' => $form_state->getValue('dpi'),
       '-compress' => 'LZW',
     ];
     if (islandora_paged_content_page_derive_pdf_datastream($object, $options)) {
