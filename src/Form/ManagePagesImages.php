@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use AbstractObject;
 
 /**
- * {@inheritdoc}
+ * Derives the image datastreams for each page object.
  */
 class ManagePagesImages extends FormBase {
 

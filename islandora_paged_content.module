@@ -41,7 +41,7 @@ function islandora_paged_content_manage_page_access_callback($object, array $con
     ISLANDORA_METADATA_EDIT,
     ISLANDORA_PURGE,
   ];
-  return islandora_user_access($object, $permissions, $content_models);
+  return islandora_user_access_check($object, $permissions, $content_models);
 }
 
 /**
