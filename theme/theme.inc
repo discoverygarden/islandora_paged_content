@@ -127,7 +127,7 @@ function swaptable_pagers(array $pager, $total) {
 function swaptable_pager($element, array $tags, $quantity, $limit, $total) {
   $page = pager_default_initialize($total, $limit, $element);
   return [
-    '#theme' => 'pager',
+    '#type' => 'pager',
     '#element' => $element,
     '#tags' => $tags,
     '#quantity' => $quantity,

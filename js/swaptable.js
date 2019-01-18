@@ -69,23 +69,6 @@
     this.limit = $('select[name="' + name + '[display]"]').val();
     this.settings = settings;
 
-    // Change all pager links so they redirect to '#'.
-    // There is a problem in that the overview display will hijack any link that
-    // links to a admin section of the site so even if we prevent the default
-    // event on click the overview panel will perform the request anyways.
-    $('.pager a', this.table).each(function () {
-      // Store the page parameters for later loading.
-      var results = this.href.match('\\?.*page=([^&]*)');
-      if ($.isArray(results) && results[1] !== undefined) {
-        $.data(this, 'pages', results[1]);
-      }
-      this.href = "#";
-    }).bind('click', function (e) {
-      e.preventDefault();
-      // Change the url to have the pager parameters.
-      self.reload($.data(this, 'pages'));
-    });
-
     // Always ensure the hidden fields has the latest ordering/modifications
     // before submitting.
     this.form.submit(function () {
