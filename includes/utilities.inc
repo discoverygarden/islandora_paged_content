@@ -12,8 +12,11 @@
  */
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Url;
+
 use Drupal\imagemagick\ImagemagickExecArguments;
 
+use Drupal\islandora\Authentication\Provider\TokenAuth;
 use Drupal\islandora_solr\IslandoraSolrQueryProcessor;
 use Drupal\islandora\MimeDetect;
 
@@ -813,9 +816,6 @@ function islandora_paged_content_apply_language_relationship_to_options(Abstract
 /**
  * Fetches the given page's dimensions.
  *
- * Firsts attempts to get it from the FITS metadata datastream, if that fails
- * it will use Djatoka.
- *
  * @param AbstractObject $object
  *   The page object.
  *
@@ -828,7 +828,6 @@ function islandora_paged_content_apply_language_relationship_to_options(Abstract
 function islandora_paged_content_get_page_dimensions(AbstractObject $object) {
   $dimensions = ['width' => 0, 'height' => 0];
   $metadata = islandora_paged_content_get_technical_metadata($object);
-  $metadata = $metadata ? $metadata : islandora_paged_content_get_page_metadata_from_djatoka($object->id);
   return $metadata ? array_intersect_key($metadata, $dimensions) : $dimensions;
 }
 
@@ -848,11 +847,10 @@ function islandora_paged_content_get_page_dimensions(AbstractObject $object) {
  *   If this function fails FALSE is returned.
  */
 function islandora_paged_content_get_technical_metadata(AbstractObject $object) {
-  // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $dsid = variable_get('islandora_fits_techmd_dsid', 'TECHMD');
+  $dsid = \Drupal::config('islandora_fits.settings')->get('islandora_fits_techmd_dsid');
+  if (!$dsid) {
+    $dsid = 'TECHMD';
+  }
 
   if (empty($object[$dsid])) {
     return FALSE;
@@ -871,63 +869,6 @@ function islandora_paged_content_get_technical_metadata(AbstractObject $object) 
   }
   file_unmanaged_delete($file);
   return $metadata;
-}
-
-/**
- * Fetches the given page's metadata via Djatoka.
- *
- * @param string $object_id
- *   The PID of the page to fetch the metadata from.
- *
- * @return array
- *   An associative array contatining the following string fields:
- *   - identifier: The URL to the resource.
- *   - imagefile: The path to the temp file being served.
- *   - width: The width of the image in pixels.
- *   - height: The width of the image in pixels.
- *   - dwtLevels: ???
- *   - levels: ???
- *   - compositingLayerCount: ???
- *   If the request to Djatoka fails then FALSE is returned.
- */
-function islandora_paged_content_get_page_metadata_from_djatoka($object_id) {
-  module_load_include('inc', 'islandora', 'includes/authtokens');
-  // @FIXME
-// url() expects a route name or an external URI.
-// $datastream_url = url("islandora/object/{$object_id}/datastream/JP2/view", array(
-//     'absolute' => TRUE,
-//     'query' => array(
-//       'token' => islandora_get_object_token($object_id, 'JP2'),
-//     ),
-//   ));
-
-
-  $djatoka_url = \Drupal::config('islandora_paged_content.settings')->get('islandora_paged_content_djatoka_url');
-  $djatoka_url .= (substr($djatoka_url, -1) == '/') ? '' : '/';
-  // @FIXME
-// url() expects a route name or an external URI.
-// $djatoka_url = url($djatoka_url . "resolver", array(
-//     'query' => array(
-//       'url_ver' => 'Z39.88-2004',
-//       'rft_id' => $datastream_url,
-//       'svc_id' => 'info:lanl-repo/svc/getMetadata',
-//     ),
-//     'external' => TRUE,
-//   ));
-
-  // @FIXME
-// drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
-// with Drupal core.
-//
-//
-// @see https://www.drupal.org/node/1862446
-// @see http://docs.guzzlephp.org/en/latest
-// $request = drupal_http_request($djatoka_url);
-
-  if ($request->code == '200') {
-    return Json::decode($request->data);
-  }
-  return FALSE;
 }
 
 /**
