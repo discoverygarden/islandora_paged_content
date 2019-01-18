@@ -63,7 +63,6 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
  * Implements template_preprocess_theme().
  */
 function template_preprocess_swaptable(array &$variables) {
-  global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
   Element::setAttributes($variables['element'], ['id', 'name']);
   $table = &$variables['element'];
   $variables['pager'] = swaptable_pagers($table['#pager'], count($table['#rows']));
