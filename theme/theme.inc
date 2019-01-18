@@ -108,11 +108,21 @@ function template_preprocess_swaptable(array &$variables) {
  *   The description of both pagers for use in the swaptable.
  */
 function swaptable_pagers(array $pager, $total) {
-  extract($pager);
-
   return [
-    'left' => swaptable_pager($element['left'], $tags, $quantity, $limit, $total),
-    'right' => swaptable_pager($element['right'], $tags, $quantity, $limit, $total),
+    'left' => swaptable_pager(
+      $pager['element']['left'],
+      $pager['tags'],
+      $pager['quantity'],
+      $pager['limit'],
+      $total
+    ),
+    'right' => swaptable_pager(
+      $pager['element']['right'],
+      $pager['tags'],
+      $pager['quantity'],
+      $pager['limit'],
+      $total
+    ),
   ];
 }
 

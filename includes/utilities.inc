@@ -503,7 +503,7 @@ function islandora_paged_content_pdf_combine(array $files, $out) {
       '@command' => $command,
       '@output' => implode('<br/>', $output),
     ];
-    \Drupal::logger('islandora_paged_content')->error('GhostScript failed to combine PDFs.<br/>Error: @ret<br/>Command: @command <br/>Output @output', []);
+    \Drupal::logger('islandora_paged_content')->error('GhostScript failed to combine PDFs.<br/>Error: @ret<br/>Command: @command <br/>Output @output', [$variables]);
     return FALSE;
   }
   return TRUE;
@@ -627,11 +627,6 @@ function islandora_paged_content_convert_to_pdf($image_file, array $options) {
   $output = '';
   $ret = -1;
   if ($exec_manager->execute($command, $args, $output, $ret) !== TRUE) {
-    $variables = [
-      '@ret' => $ret,
-      '@command' => "convert $command_args",
-      '@output' => $output,
-    ];
     \Drupal::logger('islandora_paged_content')->error(
       'ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Output: @output',
       [

@@ -58,7 +58,7 @@ function islandora_paged_content_start_batch_operation(array $operands, array &$
  * @return bool
  *   TRUE if the batch operation is complete, FALSE otherwise.
  */
-function islandora_paged_content_end_batch_operation(array &$context, $count = 1, $message = []) {
+function islandora_paged_content_end_batch_operation(array &$context, $count = 1, array $message = []) {
   $context['sandbox']['progress'] += $count;
   if ($context['sandbox']['progress'] != $context['sandbox']['total']) {
     $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['total'];

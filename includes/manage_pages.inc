@@ -7,6 +7,8 @@
 
 use Drupal\Core\Form\FormStateInterface;
 
+use Drupal\islandora\Tuque\IslandoraFedoraRepository;
+
 /**
  * Displays all the book management forms in a set of vertical tabs.
  *
@@ -91,7 +93,7 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  */
-function islandora_paged_content_quick_reorder_validate($form, FormStateInterface $form_state) {
+function islandora_paged_content_quick_reorder_validate(array $form, FormStateInterface $form_state) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
 
   $pages = islandora_paged_content_get_pages(islandora_object_load($form_state->getStorage()['pid']));
@@ -125,7 +127,7 @@ function islandora_paged_content_quick_reorder_validate($form, FormStateInterfac
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  */
-function islandora_paged_content_quick_reorder_submit($form, FormStateInterface $form_state) {
+function islandora_paged_content_quick_reorder_submit(array $form, FormStateInterface $form_state) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $page_numbers_to_move = islandora_paged_content_parse_pages_to_move($form_state->getValue('pages_to_move'));
 
@@ -162,24 +164,22 @@ function islandora_paged_content_quick_reorder_submit($form, FormStateInterface 
  * @param array $allowed_extensions
  *   The array of allowed extensions.
  * @param string $model
- *   The content model of the page object
+ *   The content model of the page object.
  * @param array $derivatives
  *   The array of derivatives.
  *
  * @return string
  *   The HTML representation of the ingest page form.
  */
-function islandora_paged_content_ingest_zipped_pages(AbstractObject $object, $allowed_extensions, $model, $derivatives) {
-  //module_load_include('inc', 'islandora', 'includes/breadcrumb');
+function islandora_paged_content_ingest_zipped_pages(AbstractObject $object, array $allowed_extensions, $model, array $derivatives) {
   module_load_include('inc', 'islandora', 'includes/utilities');
-  //drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
   return \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\UploadZippedPages', $object->id, $allowed_extensions, $model, $derivatives);
 }
 
 /**
  * Creates page objects and associates them with object.
  *
- * @param Repository $repository
+ * @param \Drupal\islandora\Tuque\IslandoraFedoraRepository $repository
  *   Active repository object to build NewFedoraObject.
  * @param array $config
  *   Associative array of required values.
@@ -187,7 +187,7 @@ function islandora_paged_content_ingest_zipped_pages(AbstractObject $object, $al
  *   This is a hack.  The finished callback needs this value so it can delete
  *   the temporary directory used to store  pages.
  */
-function islandora_paged_content_add_pages($repository, $config, $pages_directory, &$context) {
+function islandora_paged_content_add_pages(IslandoraFedoraRepository $repository, array $config, $pages_directory, &$context) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $context['results']['pages_directory'] = $pages_directory;
   $context['results']['file_count'] = $config['file_count'];
@@ -237,7 +237,7 @@ function islandora_paged_content_add_pages($repository, $config, $pages_director
  * @param int $offset
  *   Offset to determine new page number.
  */
-function islandora_paged_content_insert_sequence_gap($page_to_reindex, $offset) {
+function islandora_paged_content_insert_sequence_gap(array $page_to_reindex, $offset) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $new_page_num = (int) $page_to_reindex['page'] + $offset;
   $page_object = islandora_object_load($page_to_reindex['pid']);
