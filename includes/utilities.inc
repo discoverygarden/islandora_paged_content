@@ -11,12 +11,8 @@
  *   Generating OCR and HOCR.
  */
 
-use Drupal\Component\Serialization\Json;
-use Drupal\Core\Url;
-
 use Drupal\imagemagick\ImagemagickExecArguments;
 
-use Drupal\islandora\Authentication\Provider\TokenAuth;
 use Drupal\islandora_solr\IslandoraSolrQueryProcessor;
 use Drupal\islandora\MimeDetect;
 
