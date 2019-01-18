@@ -18,16 +18,8 @@ use Drupal\Core\Form\FormStateInterface;
  *   book objects.
  */
 function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
-  //drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
-  // @FIXME
-// drupal_set_title() has been removed. There are now a few ways to set the title
-// dynamically, depending on the situation.
-//
-//
-// @see https://www.drupal.org/node/2067859
-// drupal_set_title($object->label);
-
   $manage_tabs = [
+    '#title' => $object->label,
     'pdf' => [
       '#access' => islandora_object_access(ISLANDORA_ADD_DS, $object),
       '#title' => t('Create PDF'),
