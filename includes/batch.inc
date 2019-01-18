@@ -5,6 +5,8 @@
  * This file contains all the batch operations for paged content.
  */
 
+use Drupal\Component\Utility\Html;
+
 /**
  * Sets up a batch operation.
  *
@@ -97,16 +99,20 @@ function islandora_paged_content_batch_finished($success, $results, $operations)
         $vars = isset($message[1]) ? array_merge($message[1], $place_holders) : $place_holders;
         $status = isset($message[2]) ? $message[2] : 'status';
         $message = format_string($message[0], $vars);
-        drupal_set_message(\Drupal\Component\Utility\Html::escape($message), $status);
+        drupal_set_message(Html::escape($message), $status);
       }
     }
   }
   else {
     // Generic Error Message.
     $error_operation = reset($operations);
-    $message = t('An error occurred while processing %error_operation with arguments: @arguments', [
-                 '%error_operation' => $error_operation[0],
-                 '@arguments' => print_r($error_operation[1], TRUE)]);
+    $message = t(
+      'An error occurred while processing %error_operation with arguments: @arguments',
+      [
+        '%error_operation' => $error_operation[0],
+        '@arguments' => print_r($error_operation[1], TRUE),
+      ]
+    );
     drupal_set_message($message, 'error');
   }
 }
@@ -129,8 +135,10 @@ function islandora_paged_content_batch_finished($success, $results, $operations)
 function islandora_paged_content_create_pdf_batch(AbstractObject $paged_content, array $pages, array $options) {
   return [
     'operations' => [
-      ['islandora_paged_content_create_pdf_page_batch_operation', [
-          $pages, $options]],
+      [
+        'islandora_paged_content_create_pdf_page_batch_operation',
+        [$pages, $options],
+      ],
       ['islandora_paged_content_create_pdf_paged_content_batch_operation', [$paged_content->id]],
     ],
     'finished' => 'islandora_paged_content_batch_finished',
@@ -162,9 +170,13 @@ function islandora_paged_content_create_pdf_page_batch_operation(array $pages, a
     $context['results']['pages'][] = $pdf_file;
     $context['results']['successful'][] = islandora_paged_content_update_datastream($page, $pdf_file, 'PDF');
     islandora_paged_content_end_batch_operation($context);
-    $context['message'] = t('Converting page @page of @total into a PDF ...', [
-                            '@page' => $context['sandbox']['progress'],
-                            '@total' => $context['sandbox']['total']]);
+    $context['message'] = t(
+      'Converting page @page of @total into a PDF ...',
+      [
+        '@page' => $context['sandbox']['progress'],
+        '@total' => $context['sandbox']['total'],
+      ]
+    );
   }
 }
 
@@ -193,9 +205,13 @@ function islandora_paged_content_create_pdf_paged_content_batch_operation($paged
     islandora_paged_content_update_datastream($paged_content, $pdf_file, 'PDF');
     $context['results']['files'][] = $pdf_file;
   }
-  $context['message'] = t('Adding page @page of @total to the PDF ...', [
-                          '@page' => $context['sandbox']['progress'],
-                          '@total' => $context['sandbox']['total']]);
+  $context['message'] = t(
+    'Adding page @page of @total to the PDF ...',
+    [
+      '@page' => $context['sandbox']['progress'],
+      '@total' => $context['sandbox']['total'],
+    ]
+  );
 }
 
 /**
@@ -214,8 +230,10 @@ function islandora_paged_content_create_pdf_paged_content_batch_operation($paged
 function islandora_paged_content_create_ocr_batch(AbstractObject $paged_content, array $pages, array $options) {
   $return = [
     'operations' => [
-      ['islandora_paged_content_create_ocr_batch_operation', [
-        $pages, $options]],
+      [
+        'islandora_paged_content_create_ocr_batch_operation',
+        [$pages, $options],
+      ],
     ],
     'finished' => 'islandora_paged_content_batch_finished',
     'title' => t('Performing OCR on @label ...', ['@label' => $paged_content->label]),
@@ -256,15 +274,24 @@ function islandora_paged_content_create_ocr_batch_operation(array $pages, array 
         $context['results']['successful'][] = islandora_paged_content_update_datastream($page, $result, $dsid);
       }
     }
-    islandora_paged_content_end_batch_operation($context, 1, [
-      'Derived @derived of @set_size OCR/HOCR datastreams.',
+    islandora_paged_content_end_batch_operation(
+      $context,
+      1,
       [
-        '@set_size' => count($context['results']['successful']),
-        '@derived' => count(array_filter($context['results']['successful'])),
-      ]]);
-    $context['message'] = t('Performing OCR on page @page of @total ...', [
-                            '@page' => $context['sandbox']['progress'],
-                            '@total' => $context['sandbox']['total']]);
+        'Derived @derived of @set_size OCR/HOCR datastreams.',
+        [
+          '@set_size' => count($context['results']['successful']),
+          '@derived' => count(array_filter($context['results']['successful'])),
+        ],
+      ]
+    );
+    $context['message'] = t(
+      'Performing OCR on page @page of @total ...',
+      [
+        '@page' => $context['sandbox']['progress'],
+        '@total' => $context['sandbox']['total'],
+      ]
+    );
   }
 }
 
@@ -276,7 +303,7 @@ function islandora_paged_content_create_ocr_batch_operation(array $pages, array 
  * @param array $context
  *   The context of this batch operation.
  */
-function islandora_paged_content_create_ocr_paged_content_batch_operation($paged_content_id, &$context) {
+function islandora_paged_content_create_ocr_paged_content_batch_operation($paged_content_id, array &$context) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $paged_content = islandora_object_load($paged_content_id);
   if (empty($context['results']['pages'])) {
@@ -290,7 +317,7 @@ function islandora_paged_content_create_ocr_paged_content_batch_operation($paged
     $context['sandbox']['consolidated_ocr'] = \Drupal::service("file_system")->tempnam("temporary://", "{$paged_content->id}_OCR.txt");
     $append = TRUE;
   }
-  $context['results']['successful'][] = $append ? islandora_paged_content_ocr_append($context['sandbox']['consolidated_ocr'], array($page)) : islandora_paged_content_ocr_combine(array($page), $context['sandbox']['consolidated_ocr']);
+  $context['results']['successful'][] = $append ? islandora_paged_content_ocr_append($context['sandbox']['consolidated_ocr'], [$page]) : islandora_paged_content_ocr_combine([$page], $context['sandbox']['consolidated_ocr']);
   $finished_message = ['Created OCR with @pages pages.', ['@pages' => count($context['results']['pages'])]];
   if (islandora_paged_content_end_batch_operation($context, 1, $finished_message)) {
     module_load_include('inc', 'islandora_paged_content', 'includes/derivatives');
@@ -298,9 +325,13 @@ function islandora_paged_content_create_ocr_paged_content_batch_operation($paged
     $context['results']['files'][] = $context['sandbox']['consolidated_ocr'];
     islandora_paged_content_remove_ocr_flag($paged_content);
   }
-  $context['message'] = t('Adding page @page of @total to the OCR ...', [
-                          '@page' => $context['sandbox']['progress'],
-                          '@total' => $context['sandbox']['total']]);
+  $context['message'] = t(
+    'Adding page @page of @total to the OCR ...',
+    [
+      '@page' => $context['sandbox']['progress'],
+      '@total' => $context['sandbox']['total'],
+    ]
+  );
 }
 
 /**
@@ -317,8 +348,10 @@ function islandora_paged_content_create_ocr_paged_content_batch_operation($paged
 function islandora_paged_content_create_images_batch(AbstractObject $paged_content, array $pages) {
   return [
     'operations' => [
-      ['islandora_paged_content_create_images_batch_operation', [
-          $paged_content->id, $pages]],
+      [
+        'islandora_paged_content_create_images_batch_operation',
+        [$paged_content->id, $pages],
+      ],
     ],
     'finished' => 'islandora_paged_content_batch_finished',
     'title' => t('Creating Images for @label ...', ['@label' => $paged_content->label]),
@@ -332,7 +365,7 @@ function islandora_paged_content_create_images_batch(AbstractObject $paged_conte
 /**
  * Batch operation for creating the TN, JPG, JP2 datastreams.
  *
- * @param AbstractObject $paged_content_id
+ * @param string $paged_content_id
  *   The paged content the pages belong to.
  * @param array $pages
  *   All the pages to create images for.
@@ -349,9 +382,13 @@ function islandora_paged_content_create_images_batch_operation($paged_content_id
     if (islandora_paged_content_end_batch_operation($context, 1, ['Created images for @successful of @total pages.'])) {
       islandora_paged_content_update_paged_content_thumbnail($paged_content);
     }
-    $context['message'] = t('Creating images for page @page of @total ...', [
-                            '@page' => $context['sandbox']['progress'],
-                            '@total' => $context['sandbox']['total']]);
+    $context['message'] = t(
+      'Creating images for page @page of @total ...',
+      [
+        '@page' => $context['sandbox']['progress'],
+        '@total' => $context['sandbox']['total'],
+      ]
+    );
   }
 }
 
@@ -372,8 +409,10 @@ function islandora_paged_content_create_images_batch_operation($paged_content_id
 function islandora_paged_content_sequence_pages_batch(AbstractObject $paged_content, array $pages) {
   return [
     'operations' => [
-      ['islandora_paged_content_sequence_pages_batch_operation', [
-          $paged_content->id, $pages]],
+      [
+        'islandora_paged_content_sequence_pages_batch_operation',
+        [$paged_content->id, $pages],
+      ],
     ],
     'finished' => 'islandora_paged_content_batch_finished',
     'title' => t("Sequencing @label's pages ...", ['@label' => $paged_content->label]),
@@ -387,7 +426,7 @@ function islandora_paged_content_sequence_pages_batch(AbstractObject $paged_cont
 /**
  * Changes the ordering of the pages.
  *
- * @param AbstractObject $paged_content_id
+ * @param string $paged_content_id
  *   The paged_content the pages belong to.
  * @param array $pages
  *   All the pages in the order they should be in.
@@ -412,10 +451,14 @@ function islandora_paged_content_sequence_pages_batch_operation($paged_content_i
     if (islandora_paged_content_end_batch_operation($context, 1, ['Sequenced @label', ['@label' => $paged_content->label]])) {
       islandora_paged_content_update_paged_content_thumbnail($paged_content);
     }
-    $context['message'] = t('Inserting page "@label" (@pid) at position "@pos"', [
-                            '@label' => $page->label,
-                            '@pid' => $page->id,
-                            '@pos' => $context['sandbox']['progress']]);
+    $context['message'] = t(
+      'Inserting page "@label" (@pid) at position "@pos"',
+      [
+        '@label' => $page->label,
+        '@pid' => $page->id,
+        '@pos' => $context['sandbox']['progress'],
+      ]
+    );
   }
 }
 
@@ -433,8 +476,10 @@ function islandora_paged_content_sequence_pages_batch_operation($paged_content_i
 function islandora_paged_content_delete_pages_batch(AbstractObject $paged_content, array $pages) {
   return [
     'operations' => [
-      ['islandora_paged_content_delete_pages_batch_operation', [
-          $paged_content->id, $pages]],
+      [
+        'islandora_paged_content_delete_pages_batch_operation',
+        [$paged_content->id, $pages],
+      ],
     ],
     'finished' => 'islandora_paged_content_batch_finished',
     'title' => t('Deleting page(s) from @label ...', ['@label' => $paged_content->label]),
@@ -448,7 +493,7 @@ function islandora_paged_content_delete_pages_batch(AbstractObject $paged_conten
 /**
  * Batch operation for deleting a page object.
  *
- * @param AbstractObject $paged_content_id
+ * @param string $paged_content_id
  *   The paged_content the pages belong to.
  * @param array $pages
  *   All the pages to delete.
@@ -507,8 +552,10 @@ function islandora_paged_content_delete_parent_object_operation($pid) {
 function islandora_paged_content_create_paged_content_from_pdf_batch(AbstractObject $paged_content, array $pages, array $options) {
   return [
     'operations' => [
-      ['islandora_paged_content_create_page_from_pdf_batch_operation', [
-        $pages, $options, $paged_content->id]],
+      [
+        'islandora_paged_content_create_page_from_pdf_batch_operation',
+        [$pages, $options, $paged_content->id],
+      ],
     ],
     'finished' => 'islandora_paged_content_batch_finished',
     'title' => t('Creating pages from @label ...', ['@label' => $paged_content->label]),
@@ -587,7 +634,8 @@ function islandora_paged_content_create_page_from_pdf_batch_operation(array $pag
     islandora_paged_content_end_batch_operation($context);
     $context['message'] = t('Converting page @page of @total from a PDF ...', [
       '@page' => $context['sandbox']['progress'],
-      '@total' => $context['sandbox']['total']]);
+      '@total' => $context['sandbox']['total'],
+    ]);
 
   }
 }
@@ -613,8 +661,6 @@ function islandora_paged_content_consolidate_missing_ocr_batch() {
  */
 function islandora_paged_content_consolidate_missing_ocr_batch_operation(&$context) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $connection = islandora_get_tuque_connection();
-  $repository = $connection->repository;
   $sandbox = &$context['sandbox'];
   if (empty($sandbox)) {
     $context['finished'] = 0;

@@ -630,8 +630,8 @@ function islandora_paged_content_convert_to_pdf($image_file, array $options) {
     \Drupal::logger('islandora_paged_content')->error(
       'ImageMagick failed to create a PDF.<br/>Error: @ret<br/>Output: @output',
       [
-      '@ret' => $ret,
-      '@output' => $output,
+        '@ret' => $ret,
+        '@output' => $output,
       ]
     );
     return FALSE;
