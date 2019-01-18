@@ -8,6 +8,7 @@
 require_once dirname(__FILE__) . '/../includes/utilities.inc';
 
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 
 /**
  * Theme the page navigator.
@@ -27,54 +28,35 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
   $next_page = isset($pages[$index + 1]) ? $pages[$index + 1] : NULL;
   $links = [];
   if ($previous_page) {
-    // @FIXME
-// url() expects a route name or an external URI.
-// $links[] = array(
-//       'title' => t('Prev'),
-//       'href' => url("islandora/object/{$previous_page}", array('absolute' => TRUE)),
-//     );
-
+    $links[] = [
+      'title' => t('Prev'),
+      'url' => Url::fromRoute('islandora.view_object', ['object' => $previous_page], ['absolute' => TRUE]),
+    ];
   }
-  $links[] = [
-    'title' => '<strong>' . t('Page') . '</strong>',
-    'html' => TRUE,
-  ];
   if ($next_page) {
-    // @FIXME
-// url() expects a route name or an external URI.
-// $links[] = array(
-//       'title' => t('Next'),
-//       'href' => url("islandora/object/{$next_page}", array('absolute' => TRUE)),
-//     );
-
+    $links[] = [
+      'title' => t('Prev'),
+      'url' => Url::fromRoute('islandora.view_object', ['object' => $next_page], ['absolute' => TRUE]),
+    ];
   }
   if ($parent) {
-    // @FIXME
-// url() expects a route name or an external URI.
-// $links[] = array(
-//       'title' => t('All Pages'),
-//       'href' => url("islandora/object/{$parent->id}", array('absolute' => TRUE)),
-//     );
-
+    $links[] = [
+      'title' => t('All Pages'),
+      'url' => Url::fromRoute('islandora.view_object', ['object' => $parent->id], ['absolute' => TRUE]),
+    ];
   }
-  // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-//
-//
-// @see https://www.drupal.org/node/2195739
-// return theme('links', array(
-//     'links' => $links,
-//     'attributes' => array(
-//       'class' => array(
-//         'links',
-//         'inline',
-//       ),
-//     ),
-//   ));
-
+  $pre_render_links = [
+    '#theme' => 'links',
+    '#links' => $links,
+    '#title' => '<strong>' . t('Page') . '</strong>',
+    '#attributes' => [
+      'class' => [
+        'links',
+        'inline',
+      ],
+    ],
+  ];
+  return \Drupal::service('renderer')->render($pre_render_links);
 }
 
 /**
