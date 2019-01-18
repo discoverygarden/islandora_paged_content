@@ -7,6 +7,7 @@
 
 use Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Utility\NestedArray;
 
 // @codingStandardsIgnoreLine
 define('ISLANDORA_PAGED_CONTENT_EDIT_OCR', 'Edit existing OCR stream');
@@ -83,7 +84,7 @@ function swaptable_process(array $element, FormStateInterface $form_state) {
   $get_default_value = function ($name, $default) use ($element) {
     $key_exists = NULL;
     $name = is_array($name) ? $name : [$name];
-    $value = \Drupal\Component\Utility\NestedArray::getValue($element['#value'], $name, $key_exists);
+    $value = NestedArray::getValue($element['#value'], $name, $key_exists);
     return $key_exists ? $value : $default;
   };
   $options = [10, 25, 50, 100];
@@ -103,7 +104,6 @@ function swaptable_process(array $element, FormStateInterface $form_state) {
     ],
   ];
   // The limit for pagers is set by the "Display" select form element.
-  $limited_changed = $element['#pager']['limit'] !== $default;
   $element['#pager']['limit'] = $default;
   // Hidden fields are used to contain the current page number for each table
   // this is used by the javascript to determine the correct index of the
@@ -150,11 +150,13 @@ function swaptable_process(array $element, FormStateInterface $form_state) {
  * Ajax callback for changing the number of pages displayed.
  */
 function swaptable_change_number_of_pages_displayed(array $form, FormStateInterface $form_state) {
+// @codingStandardsIgnoreLine
   $find_swaptable = function ($form) use (&$find_swaptable) {
     if (isset($form['#type']) && $form['#type'] == 'swaptable') {
       return $form;
     }
     foreach (Element::children($form) as $child) {
+// @codingStandardsIgnoreLine
       $result = $find_swaptable($form[$child]);
       if ($result !== NULL) {
         return $result;
