@@ -47,7 +47,6 @@ class ManagePageProgression extends FormBase {
    * Submit handler to set page progression for paged content.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
     $object = islandora_object_load($form_state->getStorage()['pid']);
     islandora_paged_content_set_page_progression($object, $form_state->getValue('page_progression'));
     drupal_set_message($this->t('Page progression updated.'));
