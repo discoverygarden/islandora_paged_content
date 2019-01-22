@@ -40,6 +40,7 @@ class Admin extends ModuleHandlerAdminForm {
     $config->set('islandora_paged_content_solr_fq', $form_state->getValue('islandora_paged_content_solr_fq'));
 
     $config->save();
+    $this->messenger()->addStatus($this->t('The configuration options have been saved.'));
   }
 
   /**
