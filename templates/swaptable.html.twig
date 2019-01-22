@@ -1,0 +1,31 @@
+{#
+
+/**
+ * @file
+ * Swaptable element template.
+ */
+#}
+<div id='{{ element['#id'] }}'>
+  <div class="swaptable-display-select">
+    {{ element.display }}
+  </div>
+  <table class="swaptable-wrapper">
+    <tbody>
+      <tr>
+        <td valign="top" style="vertical-align: top;">
+          {{ table.left }}
+          {{ pager.left }}
+          {{ element.page.left }}
+        </td>
+        <td valign="top" style="vertical-align: top;">
+          {{ table.right }}
+          {{ pager.right }}
+          {{ element.page.right }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  {{ element.order }}
+  {{ element.modified }}
+  {{ element.load }}
+</div>

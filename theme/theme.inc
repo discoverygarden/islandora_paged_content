@@ -7,6 +7,9 @@
 
 require_once dirname(__FILE__) . '/../includes/utilities.inc';
 
+use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
+
 /**
  * Theme the page navigator.
  */
@@ -15,7 +18,7 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
   $results = $object->relationships->get(ISLANDORA_RELS_EXT_URI, 'isPageOf');
   $result = reset($results);
   $parent = $result ? islandora_object_load($result['object']['value']) : FALSE;
-  $pages = $parent ? islandora_paged_content_get_pages($parent) : array();
+  $pages = $parent ? islandora_paged_content_get_pages($parent) : [];
   $pages = array_keys($pages);
   if (empty($pages)) {
     $pages[] = $object->id;
@@ -23,57 +26,55 @@ function theme_islandora_paged_content_page_navigator(array $variables) {
   $index = array_search($object->id, $pages);
   $previous_page = isset($pages[$index - 1]) ? $pages[$index - 1] : NULL;
   $next_page = isset($pages[$index + 1]) ? $pages[$index + 1] : NULL;
-  $links = array();
+  $links = [];
   if ($previous_page) {
-    $links[] = array(
+    $links[] = [
       'title' => t('Prev'),
-      'href' => url("islandora/object/{$previous_page}", array('absolute' => TRUE)),
-    );
+      'url' => Url::fromRoute('islandora.view_object', ['object' => $previous_page], ['absolute' => TRUE]),
+    ];
   }
-  $links[] = array(
-    'title' => '<strong>' . t('Page') . '</strong>',
-    'html' => TRUE,
-  );
   if ($next_page) {
-    $links[] = array(
-      'title' => t('Next'),
-      'href' => url("islandora/object/{$next_page}", array('absolute' => TRUE)),
-    );
+    $links[] = [
+      'title' => t('Prev'),
+      'url' => Url::fromRoute('islandora.view_object', ['object' => $next_page], ['absolute' => TRUE]),
+    ];
   }
   if ($parent) {
-    $links[] = array(
+    $links[] = [
       'title' => t('All Pages'),
-      'href' => url("islandora/object/{$parent->id}", array('absolute' => TRUE)),
-    );
+      'url' => Url::fromRoute('islandora.view_object', ['object' => $parent->id], ['absolute' => TRUE]),
+    ];
   }
-  return theme('links', array(
-    'links' => $links,
-    'attributes' => array(
-      'class' => array(
+  $pre_render_links = [
+    '#theme' => 'links',
+    '#links' => $links,
+    '#title' => '<strong>' . t('Page') . '</strong>',
+    '#attributes' => [
+      'class' => [
         'links',
         'inline',
-      ),
-    ),
-  ));
+      ],
+    ],
+  ];
+  return \Drupal::service('renderer')->render($pre_render_links);
 }
 
 /**
  * Implements template_preprocess_theme().
  */
 function template_preprocess_swaptable(array &$variables) {
-  global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
-  element_set_attributes($variables['element'], array('id', 'name'));
+  Element::setAttributes($variables['element'], ['id', 'name']);
   $table = &$variables['element'];
   $variables['pager'] = swaptable_pagers($table['#pager'], count($table['#rows']));
   $variables['table']['left'] = swaptable_table('left', $table, $variables['pager']['left']);
   $variables['table']['right'] = swaptable_table('right', $table, $variables['pager']['right']);
   $base = $table['#id'];
-  $settings['swapTable'][$base] = array(
+  $variables['#attached']['drupalSettings']['swapTable'][$base] = [
     'name' => $table['#name'],
     'order' => $table['order']['#value'],
     'modified' => $table['modified']['#value'],
-  );
-  drupal_add_js($settings, 'setting');
+  ];
+
 }
 
 /**
@@ -88,11 +89,22 @@ function template_preprocess_swaptable(array &$variables) {
  *   The description of both pagers for use in the swaptable.
  */
 function swaptable_pagers(array $pager, $total) {
-  extract($pager);
-  return array(
-    'left' => swaptable_pager($element['left'], $tags, $quantity, $limit, $total),
-    'right' => swaptable_pager($element['right'], $tags, $quantity, $limit, $total),
-  );
+  return [
+    'left' => swaptable_pager(
+      $pager['element']['left'],
+      $pager['tags'],
+      $pager['quantity'],
+      $pager['limit'],
+      $total
+    ),
+    'right' => swaptable_pager(
+      $pager['element']['right'],
+      $pager['tags'],
+      $pager['quantity'],
+      $pager['limit'],
+      $total
+    ),
+  ];
 }
 
 /**
@@ -112,15 +124,19 @@ function swaptable_pagers(array $pager, $total) {
  * @return array
  *   The pager definition for use in the swaptable.
  */
-function swaptable_pager($element, $tags, $quantity, $limit, $total) {
+function swaptable_pager($element, array $tags, $quantity, $limit, $total) {
   $page = pager_default_initialize($total, $limit, $element);
-  return array(
-    'element' => $element,
-    'tags' => $tags,
-    'quantity' => $quantity,
-    'limit' => $limit,
-    'page' => $page,
-  );
+  return [
+    '#type' => 'pager',
+    '#element' => $element,
+    '#tags' => $tags,
+    '#quantity' => $quantity,
+    '#parameters' => [],
+    '#route_name' => \Drupal::routeMatch()->getRouteName(),
+    '#route_parameters' => \Drupal::routeMatch()->getRawParameters()->all(),
+    '#limit' => $limit,
+    '#page' => $page,
+  ];
 }
 
 /**
@@ -142,33 +158,33 @@ function swaptable_pager($element, $tags, $quantity, $limit, $total) {
  *   The rows definition for the table.
  */
 function swaptable_table_rows($position, array $items, array $ordering, array $modified, array $pager) {
-  $rows = array();
-  $offset = $pager['page'] * $pager['limit'];
-  $ordering = array_slice($ordering, $offset, $pager['limit']);
-  $original_ordering = element_children($items);
+  $rows = [];
+  $offset = $pager['#page'] * $pager['#limit'];
+  $ordering = array_slice($ordering, $offset, $pager['#limit']);
+  $original_ordering = Element::children($items);
   foreach ($ordering as $i => $item) {
     $row = $items[$item];
-    $data = array();
-    $data[] = array(
+    $data = [];
+    $data[] = [
       'data' => $offset + $i + 1,
-      'class' => array('ordering'),
-    );
-    $data[] = array(
+      'class' => ['ordering'],
+    ];
+    $data[] = [
       'data' => array_search($item, $original_ordering) + 1,
-      'class' => array('original-ordering', 'swaptable-hide'),
-    );
-    foreach (element_children($row) as $j) {
+      'class' => ['original-ordering', 'swaptable-hide'],
+    ];
+    foreach (Element::children($row) as $j) {
       $cell = $row[$j];
-      $data[] = array(
-        'data' => empty($cell['#printed']) ? drupal_render($cell) : $cell['#children'],
-        'class' => array($j),
-      );
+      $data[] = [
+        'data' => empty($cell['#printed']) ? \Drupal::service("renderer")->render($cell) : $cell['#children'],
+        'class' => [$j],
+      ];
     }
-    $rows[] = array(
+    $rows[] = [
       'id' => str_replace(':', '-', "{$position}-{$item}"),
-      'class' => in_array($item, $modified) ? array('ui-modified') : array(),
+      'class' => in_array($item, $modified) ? ['ui-modified'] : [],
       'data' => $data,
-    );
+    ];
   }
   return $rows;
 }
@@ -190,19 +206,20 @@ function swaptable_table($position, array $table, array $pager) {
   $table['#attributes']['id'] = "{$table['#id']}-{$position}";
   $table['#attributes']['name'] = $position;
   $table['#attributes']['valign'] = 'top';
-  $header = array(
-    array(
+  $header = [
+    [
       'data' => t('Page #'),
-      'class' => array('ordering'),
-    ),
-    array(
+      'class' => ['ordering'],
+    ],
+    [
       'data' => t('*Original Page #'),
-      'class' => array('original-ordering', 'swaptable-hide'),
-    ),
-  );
-  return array(
-    'header' => array_merge($header, $table['#header']),
-    'rows' => swaptable_table_rows($position, $table['#rows'], $table['order']['#value'], $table['modified']['#value'], $pager),
-    'attributes' => $table['#attributes'],
-  );
+      'class' => ['original-ordering', 'swaptable-hide'],
+    ],
+  ];
+  return [
+    '#theme' => 'table',
+    '#header' => array_merge($header, $table['#header']),
+    '#rows' => swaptable_table_rows($position, $table['#rows'], $table['order']['#value'], $table['modified']['#value'], $pager),
+    '#attributes' => $table['#attributes'],
+  ];
 }

@@ -5,6 +5,8 @@
  * Callbacks used in derivatives hook.
  */
 
+use Drupal\Core\Logger\RfcLogLevel;
+
 /**
  * Generate a PDF derivative.
  */
@@ -19,36 +21,36 @@ function islandora_paged_content_derivatives_pdf(AbstractObject $object, $force 
     file_unmanaged_delete($pdf_file);
 
     if ($ret) {
-      return array(
+      return [
         'success' => TRUE,
-        'messages' => array(
-          array(
-            'message' => t('Generated %dsid on %pid.'),
-            'message_sub' => array(
-              '%dsid' => 'PDF',
-              '%pid' => $object->id,
-            ),
+        'messages' => [
+          [
+            'message' => t('Generated @dsid on @pid.'),
+            'message_sub' => [
+              '@dsid' => 'PDF',
+              '@pid' => $object->id,
+            ],
             'type' => 'dsm',
             'severity' => 'status',
-          ),
-        ),
-      );
+          ],
+        ],
+      ];
     }
     else {
-      return array(
+      return [
         'success' => FALSE,
-        'messages' => array(
-          array(
-            'message' => t('Failed to generated %dsid on %pid.'),
-            'message_sub' => array(
-              '%dsid' => 'PDF',
-              '%pid' => $object->id,
-            ),
+        'messages' => [
+          [
+            'message' => t('Failed to generated @dsid on @pid.'),
+            'message_sub' => [
+              '@dsid' => 'PDF',
+              '@pid' => $object->id,
+            ],
             'type' => 'watchdog',
-            'severity' => WATCHDOG_ERROR,
-          ),
-        ),
-      );
+            'severity' => RfcLogLevel::ERROR,
+          ],
+        ],
+      ];
     }
   }
 }
@@ -72,36 +74,36 @@ function islandora_paged_content_derive_thumbnail_of_parent(AbstractObject $book
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   if ($force || !isset($book_object['TN'])) {
     if (islandora_paged_content_update_paged_content_thumbnail($book_object)) {
-      return array(
+      return [
         'success' => TRUE,
-        'messages' => array(
-          array(
+        'messages' => [
+          [
             'message' => t('Updated @dsid on @parent.'),
-            'message_sub' => array(
+            'message_sub' => [
               '@dsid' => 'TN',
               '@parent' => $book_object->id,
-            ),
+            ],
             'type' => 'dsm',
             'severity' => 'status',
-          ),
-        ),
-      );
+          ],
+        ],
+      ];
     }
     else {
-      return array(
+      return [
         'success' => FALSE,
-        'messages' => array(
-          array(
+        'messages' => [
+          [
             'message' => t('Failed to update @dsid on @parent.'),
-            'message_sub' => array(
+            'message_sub' => [
               '@dsid' => 'TN',
               '@parent' => $book_object->id,
-            ),
+            ],
             'type' => 'watchdog',
-            'severity' => WATCHDOG_ERROR,
-          ),
-        ),
-      );
+            'severity' => RfcLogLevel::ERROR,
+          ],
+        ],
+      ];
     }
   }
 }
@@ -116,13 +118,13 @@ function islandora_paged_content_aggregate_pdf_derivative(AbstractObject $object
     $batch = islandora_paged_content_create_pdf_batch(
       $object,
       array_keys(islandora_paged_content_get_pages($object)),
-      array(
+      [
         '-density' => '96',
         '-compress' => 'LZW',
-      )
+      ]
     );
 
-    $batch['operations'][] = array('islandora_book_batch_remove_pdf_flag', array($object));
+    $batch['operations'][] = ['islandora_book_batch_remove_pdf_flag', [$object]];
     batch_set($batch);
   }
 }
@@ -137,7 +139,7 @@ function islandora_paged_content_aggregate_ocr_derivative(AbstractObject $object
     $batch = islandora_paged_content_create_ocr_batch(
       $object,
       array_keys(islandora_paged_content_get_pages($object)),
-      array('aggregate_ocr' => TRUE)
+      ['aggregate_ocr' => TRUE]
     );
     batch_set($batch);
   }

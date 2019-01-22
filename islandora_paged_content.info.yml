@@ -1,0 +1,9 @@
+name: 'Islandora Paged Content'
+description: 'Libraries for paged content in Islandora.'
+dependencies:
+  - :islandora
+package: 'Islandora Solution Packs'
+configure: islandora_paged_content.admin
+core: 8.x
+type: module
+php: '5.5.9'

@@ -1,9 +1,18 @@
-(function($) {
+/**
+ * @file
+ * JS for preview.
+ */
+
+(function ($, Drupal) {
   Drupal.behaviors.islandora_paged_content = {
-    attach: function(context, settings) {
-      $("a.preview").click(function() {
-        $('div.ref_image').dialog(({position: { my: "left top", at: "top", collision:'none', of:'#edit-ocr' }, width: Drupal.settings.width}));
+    attach: function (context, settings) {
+      $("a.preview").click(function () {
+        $('div.ref_image').dialog(
+        ({
+          position: {my: "left top", at: "top", collision:'none', of:'#edit-ocr' },
+          width: drupalSettings.islandora_paged_content.edit_ocr.width
+        }));
       });
     }
   };
-})(jQuery);
+})(jQuery, Drupal);

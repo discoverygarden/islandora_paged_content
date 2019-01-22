@@ -1,8 +1,13 @@
-(function ($) {
+/**
+ * @file
+ * JS to enable the swaptable.
+ */
+
+(function ($, Drupal) {
   "use strict";
 
   /**
-   * jQuery Helper function for determining order.
+   * Helper function for determining order.
    *
    * Very dumb method doesn't test for the same element or not siblings etc.
    */
@@ -11,7 +16,7 @@
   };
 
   /**
-   * jQuery Helper function for determining order.
+   * Helper function for determining order.
    *
    * Very dumb method doesn't test for the same element or not siblings etc.
    */
@@ -32,7 +37,7 @@
         };
       for (base in settings.swapTable) {
         if (settings.swapTable.hasOwnProperty(base)) {
-          $('#' + base, context).once('swaptable', constructSwapTable);
+          $('#' + base, context).once('swaptable').each(constructSwapTable);
         }
       }
     }
@@ -48,7 +53,6 @@
    */
   Drupal.swapTable = function (table, settings) {
     var self = this, name = settings.name;
-
     // Required object variables.
     this.table = table;
     this.form = $(table).parents('form');
@@ -64,33 +68,6 @@
     };
     this.limit = $('select[name="' + name + '[display]"]').val();
     this.settings = settings;
-
-    // Change all pager links so they redirect to '#'.
-    // There is a problem in that the overview display will hijack any link that
-    // links to a admin section of the site so even if we prevent the default
-    // event on click the overview panel will perform the request anyways.
-    $('.pager a', this.table).each(function() {
-      // Store the page parameters for later loading.
-      var results = this.href.match('\\?.*page=([^&]*)');
-      if ($.isArray(results) && results[1] !== undefined) {
-        $.data(this, 'pages', results[1]);
-      }
-      this.href = "#";
-    }).bind('click', function (e) {
-      e.preventDefault();
-      // Change the url to have the pager parameters.
-      self.reload($.data(this, 'pages'));
-    });
-
-    // Before any ajax elements within this form serialize the form values
-    // make sure we update the hidden value with the latest ordering and
-    // modifications.
-    $('.ajax-processed', this.form).each(function () {
-      Drupal.ajax[this.id].beforeSerialize = function (element, options) {
-        self.serializeOrderAndModifications();
-        Drupal.ajax.prototype.beforeSerialize.call(this, element, options);
-      };
-    });
 
     // Always ensure the hidden fields has the latest ordering/modifications
     // before submitting.
@@ -116,17 +93,18 @@
     // Add a link before the table for users to show or hide weight columns.
     $('<a href="#" class="swaptable-toggle-original-ordering"></a>')
       .attr('title', Drupal.t('Show the original order of items.'))
-      .click(function () {
-        if ($.cookie('Drupal.swapTable.showOriginal') === 1) {
-          self.hideColumns();
-        } else {
-          self.showColumns();
-        }
-        return false;
-      })
       .wrap('<div class="swaptable-toggle-original-ordering-wrapper"></div>')
       .parent()
       .insertBefore(this.table);
+    $('.swaptable-toggle-original-ordering').click(function () {
+        if ($.cookie('Drupal.swapTable.showOriginal') == 1) {
+          self.hideColumns();
+        }
+        else {
+          self.showColumns();
+        }
+        return false;
+      });
 
     // Initialize the specified columns.
     self.initColumns();
@@ -157,7 +135,7 @@
       containment: this.table,
       opacity: 0.7,
       helper: function (event) {
-        var selected = $(event.currentTarget).siblings('.ui-selected').andSelf().addClass('ui-selected'),
+        var selected = $(event.currentTarget).siblings('.ui-selected').addBack().addClass('ui-selected'),
           content = $(selected[0]).clone(false).removeAttr('id').removeClass('ui-droppable'),
           helper = $('<div class="ui-helper" style="position: absolute;"/>');
         $('.ordering', content).hide();
@@ -185,7 +163,7 @@
       start: function (event, ui) {
         var table = $(this).parents('table')[0],
           otherTable = (table === self.left) ? self.right : self.left,
-          selected = $(this).siblings('.ui-selected').andSelf();
+          selected = $(this).siblings('.ui-selected').addBack();
         // Cancel selections in other table now that dragging has begun.
         $('tr.ui-selected', otherTable).removeClass('ui-selected');
         self.selectElements(this, selected);
@@ -234,10 +212,11 @@
    * Triggers and hidden submit button that uses ajax to rebuild the page.
    */
   Drupal.swapTable.prototype.reload = function (pages) {
+    this.serializeOrderAndModifications();
     var id = $(this.load).attr('id');
     pages = pages || this.page.left + ',' + this.page.right;
-    Drupal.ajax[id].options.url += '?page=' + pages;
-    $(this.load).trigger('mousedown');
+    drupalSettings.ajax[id].url += '?page=' + pages;
+    $(this.load).mousedown();
   };
 
   /**
@@ -300,11 +279,13 @@
     if (event.shiftKey && !event.metaKey && last) {
       list = $(row).isAfter($(last)) ? $(last).nextUntil(id) : $(last).prevUntil(id);
       list.add(row).addClass('ui-selected');
-    } else if (event.metaKey) {
+    }
+    else if (event.metaKey) {
       // Select/Deselect only the current selection.
       $(row).toggleClass('ui-selected');
       $.data(table, 'last', row);
-    } else {
+    }
+    else {
       // Select only the given row.
       $(row).addClass('ui-selected').siblings().removeClass('ui-selected');
       $.data(table, 'last', row);
@@ -342,7 +323,7 @@
     // Show the currently selected rows only if they belong to the other table.
     this.getSelectedElements(table, selected).hide();
     $('tr:hidden', otherTable).show();
-    // Show the place holder on only the current table
+    // Show the place holder on only the current table.
     $('tr.ui-placeholder', table).show();
     $('tr.ui-placeholder', otherTable).hide();
   };
@@ -376,7 +357,8 @@
       list = $('tbody > tr:visible', table);
     if (list.index(row) > list.index(placeholder)) {
       $(row).after(placeholder);
-    } else {
+    }
+    else {
       $(row).before(placeholder);
     }
   };
@@ -418,16 +400,18 @@
     // Set a cookie if it is not already present.
     if ($.cookie('Drupal.swapTable.showOriginal') === null) {
       $.cookie('Drupal.swapTable.showOriginal', 0, {
-        path: Drupal.settings.basePath,
+        path: drupalSettings.basePath,
         // The cookie expires in one year.
         expires: 365
       });
       this.hideColumns();
-    } else {
+    }
+    else {
       // Check cookie value and show/hide weight columns accordingly.
       if ($.cookie('Drupal.swapTable.showOriginal') === 1) {
         this.showColumns();
-      } else {
+      }
+      else {
         this.hideColumns();
       }
     }
@@ -435,35 +419,37 @@
 
   /**
    * Hide the columns containing weight/parent form elements.
+   *
    * Undo showColumns().
    */
   Drupal.swapTable.prototype.hideColumns = function () {
     // Hide weight/parent cells and headers.
-    $('.swaptable-hide', '.swaptable-processed').hide();
+    $('.swaptable-hide').hide();
     // Change link text.
     $('.swaptable-toggle-original-ordering').text(Drupal.t('Show original order'));
     // Change cookie.
     $.cookie('Drupal.swapTable.showOriginal', 0, {
-      path: Drupal.settings.basePath,
+      path: drupalSettings.basePath,
       // The cookie expires in one year.
       expires: 365
     });
   };
 
   /**
-   * Show the columns containing weight/parent form elements
+   * Show the columns containing weight/parent form elements.
+   *
    * Undo hideColumns().
    */
   Drupal.swapTable.prototype.showColumns = function () {
     // Show weight/parent cells and headers.
-    $('.swaptable-hide', '.swaptable-processed').show();
+    $('.swaptable-hide').show();
     // Change link text.
     $('.swaptable-toggle-original-ordering').text(Drupal.t('Hide original order'));
     // Change cookie.
     $.cookie('Drupal.swapTable.showOriginal', 1, {
-      path: Drupal.settings.basePath,
+      path: drupalSettings.basePath,
       // The cookie expires in one year.
       expires: 365
     });
   };
-}(jQuery));
+}(jQuery, Drupal));

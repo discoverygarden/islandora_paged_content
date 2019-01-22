@@ -1,0 +1,24 @@
+swaptable:
+  version: 1.x
+  js:
+    js/swaptable.js: {}
+  css:
+    layout:
+      css/islandora_paged_content.swaptable.css: {}
+  dependencies:
+    - core/jquery.cookie
+    - core/jquery.ui.draggable
+    - core/jquery.ui.droppable
+    - core/jquery.ui.sortable
+    - core/jquery.ui.selectable
+    - core/drupalSettings
+    - core/drupal
+edit-ocr:
+  version: 1.x
+  js:
+    js/islandora_page_ocr_edit.js: {}
+  css:
+    layout:
+      css/islandora_paged_content.css: {}
+  dependencies:
+    - core/jquery.ui.dialog
