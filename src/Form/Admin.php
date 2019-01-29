@@ -55,6 +55,7 @@ class Admin extends ModuleHandlerAdminForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_state->loadInclude('islandora_paged_content', 'inc', 'includes/admin.form');
+    $form_state->loadInclude('islandora', 'inc', 'includes/utilities');
     $get_default_value = function ($name) use ($form_state) {
       $values = $form_state->getValues();
       return isset($values[$name]) ? $values[$name] : $this->config('islandora_paged_content.settings')->get($name);
@@ -75,7 +76,7 @@ class Admin extends ModuleHandlerAdminForm {
           '#type' => 'textfield',
           '#title' => $this->t('gs (GhostScript)'),
           '#description' => $this->t('GhostScript is used to combine PDF files into a representation of a book or newspaper.<br/>') .
-          islandora_paged_content_admin_settings_form_executable_available_message($gs),
+          islandora_executable_available_message($gs),
           '#default_value' => $gs,
           '#prefix' => '<div id="gs-wrapper">',
           '#suffix' => '</div>',
@@ -94,7 +95,7 @@ class Admin extends ModuleHandlerAdminForm {
           '#type' => 'textfield',
           '#title' => $this->t('pdfinfo'),
           '#description' => $this->t('Pdfinfo is used to extract information needed when ingesting a single PDF into paged content and individual page objects.<br/>') .
-          islandora_paged_content_admin_settings_form_executable_available_message($pdfinfo),
+          islandora_executable_available_message($pdfinfo),
           '#default_value' => $pdfinfo,
           '#prefix' => '<div id="pdfinfo-wrapper">',
           '#suffix' => '</div>',
@@ -109,7 +110,7 @@ class Admin extends ModuleHandlerAdminForm {
           '#type' => 'textfield',
           '#title' => $this->t('pdftotext'),
           '#description' => $this->t('Pdftotext is used to extract text for OCR when ingesting a single PDF into paged content and individual page objects.<br/>') .
-          islandora_paged_content_admin_settings_form_executable_available_message($pdftotext),
+          islandora_executable_available_message($pdftotext),
           '#default_value' => $pdftotext,
           '#prefix' => '<div id="pdftotext-wrapper">',
           '#suffix' => '</div>',

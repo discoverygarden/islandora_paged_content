@@ -9,48 +9,6 @@ use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Gets a message to display if the ocr program provided is accessible or not.
- *
- * @param string $path
- *   The path to an executable to check for availability.
- * @param string $version
- *   The version of exectuable.
- *
- * @return string
- *   A message in html detailing if the given executable is accessible.
- */
-function islandora_paged_content_admin_settings_form_executable_available_message($path, $version = NULL, $required_version = NULL) {
-  $available = is_executable($path);
-  if ($available) {
-    $image = [
-      '#theme' => 'image',
-      '#uri' => Url::fromUri('base:core/misc/icons/73b355/check.svg')->toString(),
-    ];
-    $message = t('Executable found at @path', ['@path' => $path]);
-    if ($version) {
-      $message .= t('<br/>Version: @version', ['@version' => $version]);
-    }
-    if ($required_version) {
-      $message .= t('<br/>Required Version: @version', ['@version' => $required_version]);
-      if (version_compare($version, $required_version) < 0) {
-        $image = [
-          '#theme' => 'image',
-          '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
-        ];
-      }
-    }
-  }
-  else {
-    $image = [
-      '#theme' => 'image',
-      '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
-    ];
-    $message = t('Unable to locate executable at @path', ['@path' => $path]);
-  }
-  return \Drupal::service('renderer')->render($image) . $message;
-}
-
-/**
  * Ajax callback for the GS textfield.
  *
  * @param array $form
