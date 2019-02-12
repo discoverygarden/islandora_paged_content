@@ -33,10 +33,16 @@ function islandora_paged_content_admin_settings_form_gs_ajax_callback(array $for
  * @return string
  *   A message in html detailing if the djatoka is accessible.
  */
-function islandora_paged_content_admin_settings_form_djatoka_availible_message($djatoka_url) {
+function islandora_paged_content_admin_settings_form_djatoka_available_message($djatoka_url) {
   $file_headers = @get_headers($djatoka_url);
-  $djatoka_availible = strstr($file_headers[0], '200') !== FALSE;
-  if ($djatoka_availible) {
+  $djatoka_available = FALSE;
+  foreach ($file_headers as $file_header) {
+    if (strpos($file_header, '200') !== FALSE) {
+      $djatoka_available = TRUE;
+      break;
+    }
+  }
+  if ($djatoka_available) {
     $image = [
       '#theme' => 'image',
       '#uri' => Url::fromUri('base:core/misc/icons/73b355/check.svg')->toString(),
