@@ -65,7 +65,7 @@ class Admin extends ModuleHandlerAdminForm {
     $pdftotext = $get_default_value('islandora_paged_content_pdftotext');
 
     $djatoka_url = $get_default_value('islandora_paged_content_djatoka_url');
-    $djatoka_availible_message = islandora_paged_content_admin_settings_form_djatoka_availible_message($djatoka_url);
+    $djatoka_available_message = islandora_paged_content_admin_settings_form_djatoka_available_message($djatoka_url);
     $solr_enabled = $this->moduleHandler->moduleExists('islandora_solr');
 
     $form = [
@@ -133,7 +133,7 @@ class Admin extends ModuleHandlerAdminForm {
         '#prefix' => '<div id="djatoka-path-wrapper">',
         '#suffix' => '</div>',
         '#title' => $this->t('djatoka URL'),
-        '#description' => $this->t('<strong>Externally accessible</strong> URL to the djatoka instance.<br/>') . $djatoka_availible_message,
+        '#description' => $this->t('<strong>Externally accessible</strong> URL to the djatoka instance.<br/>') . $djatoka_available_message,
         '#default_value' => $djatoka_url,
         '#ajax' => [
           'callback' => 'islandora_paged_content_admin_settings_form_djatoka_ajax_callback',
