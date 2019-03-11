@@ -79,6 +79,9 @@ function islandora_paged_content_manage_pages_menu(AbstractObject $object) {
       '#open' => FALSE,
       'form' => \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePagesDelete', $object),
     ],
+    '#cache' => [
+      'max-age' => 0,
+    ],
   ];
   $context = ['object' => $object];
   \Drupal::moduleHandler()->alter('islandora_paged_content_pages_management_tabs', $manage_tabs, $context);

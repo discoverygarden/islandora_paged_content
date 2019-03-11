@@ -45,6 +45,9 @@ function islandora_paged_content_manage_page_menu(AbstractObject $object) {
       'form' => isset($object['OCR']) && isset($object['JPG']) ? \Drupal::formBuilder()->getForm('Drupal\islandora_paged_content\Form\ManagePageEditOcr', $object) : NULL,
       '#open' => FALSE,
     ],
+    '#cache' => [
+      'max-age' => 0,
+    ],
   ];
   $context = ['object' => $object];
   \Drupal::moduleHandler()->alter('islandora_paged_content_page_management_tabs', $manage_tabs, $context);
