@@ -20,7 +20,9 @@ class DefaultController extends ControllerBase {
    */
   public function managePageAccess($models, $object, AccountInterface $account) {
     $object = islandora_object_load($object);
-    return AccessResult::allowedIf(islandora_paged_content_manage_page_access_callback($object, $models, $account));
+    return AccessResult::allowedIf(islandora_paged_content_manage_page_access_callback($object, $models, $account))
+      ->addCacheableDependency($object)
+      ->cachePerPermissions();
   }
 
   /**
@@ -36,7 +38,9 @@ class DefaultController extends ControllerBase {
    */
   public function managePagesAccess($models, $object, AccountInterface $account) {
     $object = islandora_object_load($object);
-    return AccessResult::allowedIf(islandora_paged_content_manage_pages_access_callback($object, $models, $account));
+    return AccessResult::allowedIf(islandora_paged_content_manage_pages_access_callback($object, $models, $account))
+      ->addCacheableDependency($object)
+      ->cachePerPermissions();
   }
 
   /**
