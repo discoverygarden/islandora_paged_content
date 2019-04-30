@@ -18,7 +18,9 @@ use Drush\Commands\DrushCommands;
 class IslandoraPagedContentCommands extends DrushCommands {
 
   /**
-   * Consolidates and appends paged content page OCR to any paged content objects with no OCR datastream.
+   * Consolidates and appends paged content page OCR...
+   *
+   * ... to any paged content objects with no OCR datastream.
    *
    * @usage drush -u 1 paged-content-consolidate-missing-ocr
    *   Trigger OCR consolidation
