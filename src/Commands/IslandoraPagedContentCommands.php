@@ -5,15 +5,7 @@ namespace Drupal\islandora_paged_content\Commands;
 use Drush\Commands\DrushCommands;
 
 /**
- * A Drush commandfile.
- *
- * In addition to this file, you need a drush.services.yml
- * in root of your module, and a composer.json file that provides the name
- * of the services file to use.
- *
- * See these files for an example of injecting Drupal services:
- *   - http://cgit.drupalcode.org/devel/tree/src/Commands/DevelCommands.php
- *   - http://cgit.drupalcode.org/devel/tree/drush.services.yml
+ * Drush commandfile for Islandora Paged Content.
  */
 class IslandoraPagedContentCommands extends DrushCommands {
 
@@ -22,7 +14,7 @@ class IslandoraPagedContentCommands extends DrushCommands {
    *
    * ... to any paged content objects with no OCR datastream.
    *
-   * @usage drush -u 1 paged-content-consolidate-missing-ocr
+   * @usage drush -u1 paged-content-consolidate-missing-ocr
    *   Trigger OCR consolidation
    * @validate-module-enabled islandora_ocr,islandora_paged_content,islandora
    * @islandora-user-wrap
