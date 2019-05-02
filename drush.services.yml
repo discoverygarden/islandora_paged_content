@@ -1,0 +1,5 @@
+services:
+  islandora_paged_content.commands:
+    class: \Drupal\islandora_paged_content\Commands\IslandoraPagedContentCommands
+    tags:
+      - { name: drush.command }
