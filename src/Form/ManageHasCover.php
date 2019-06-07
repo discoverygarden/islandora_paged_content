@@ -30,7 +30,7 @@ class ManageHasCover extends FormBase {
       'has_cover' => [
         '#type' => 'radios',
         '#title' => $this->t('Book Cover?'),
-        '#description' => $this->t("This affects how Paged CMODEL Viewers display their first page in a sequence. If set to 'Without Cover', the first page will be displayed on the left side, for a Left-to-Right progression, which means the display will start with a full 2 page spread. Needs to be used in conjuction with a 'Paged' Page display mode or the global '2-up' setting for the IA Book Reader viewer"),
+        '#description' => $this->t("This affects how Paged CMODEL Viewers display their first page in a sequence. If set to 'Without Cover', the first page will be displayed on the left side, for a Left-to-Right progression, which means the display will start with a full 2 page spread. Needs to be used in conjuction with a 'Paged' Page display mode or the global '2-up' setting for the IA Book Reader viewer."),
         '#options' => [
           'true' => $this->t('Has Cover or First Recto (default)'),
           'false' => $this->t('Without Cover'),
